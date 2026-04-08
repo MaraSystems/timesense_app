@@ -14,8 +14,9 @@ describe('Homepage', () => {
       cy.contains('Appointments').should('be.visible')
     })
 
-    it('should display Create Calendar button', () => {
-      cy.contains('Create Calendar').should('be.visible')
+    it('should display Login and Get Started buttons', () => {
+      cy.contains('Login').should('be.visible')
+      cy.contains('Get Started').should('be.visible')
     })
 
     it('should toggle mobile menu when hamburger is clicked', () => {
@@ -44,9 +45,9 @@ describe('Homepage', () => {
       cy.contains('Create calendars, book appointments, and manage your schedule').should('be.visible')
     })
 
-    it('should display View Calendars and Create Calendar buttons', () => {
-      cy.get('main').contains('View Calendars').should('be.visible')
-      cy.get('main').contains('Create Calendar').should('be.visible')
+    it('should display Get Started and Login buttons', () => {
+      cy.get('main').contains('Get Started').should('be.visible')
+      cy.get('main').contains('Login').should('be.visible')
     })
 
     it('should display trust indicators', () => {

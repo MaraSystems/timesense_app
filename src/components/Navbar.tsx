@@ -1,9 +1,22 @@
 import { useState } from "react"
-import { Link, NavLink } from "react-router-dom"
-import { HiOutlineMenu, HiOutlineX } from "react-icons/hi"
+import { Link, NavLink, useNavigate } from "react-router-dom"
+import { HiOutlineMenu, HiOutlineX, HiOutlineLogout, HiOutlineUser } from "react-icons/hi"
+import { useAuth } from "../auth"
 
-export function Navbar() {
+interface NavbarProps {
+  isAuthenticated: boolean
+}
+
+export function Navbar({ isAuthenticated }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+    setIsMenuOpen(false)
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b border-[#E5EAF2] z-50">
@@ -47,12 +60,36 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <NavLink
-              to="/calendars/new"
-              className="bg-[#0052FF] text-white px-4 py-2 rounded-lg hover:bg-[#0046E0] transition-colors"
-            >
-              Create Calendar
-            </NavLink>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center gap-2 text-[#6B7280]">
+                  <HiOutlineUser className="w-5 h-5" />
+                  <span className="text-sm">{user?.email}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                >
+                  <HiOutlineLogout className="w-5 h-5" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  className="text-[#6B7280] hover:text-[#0052FF] transition-colors font-medium"
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className="bg-[#0052FF] text-white px-4 py-2 rounded-lg hover:bg-[#0046E0] transition-colors"
+                >
+                  Get Started
+                </NavLink>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -71,6 +108,7 @@ export function Navbar() {
             <div className="flex flex-col gap-4">
               <NavLink
                 to="/"
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
                   isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
                 }
@@ -79,6 +117,7 @@ export function Navbar() {
               </NavLink>
               <NavLink
                 to="/calendars"
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
                   isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
                 }
@@ -87,6 +126,7 @@ export function Navbar() {
               </NavLink>
               <NavLink
                 to="/appointments"
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
                   isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
                 }
@@ -94,9 +134,38 @@ export function Navbar() {
                 Appointments
               </NavLink>
               <div className="flex flex-col gap-2 pt-4 border-t border-[#E5EAF2]">
-                <NavLink to="/calendars/new" className="bg-[#0052FF] text-white px-4 py-2 rounded-lg hover:bg-[#0046E0] transition-colors w-full text-center">
-                  Create Calendar
-                </NavLink>
+                {isAuthenticated ? (
+                  <>
+                    <div className="flex items-center gap-2 text-[#6B7280] px-2">
+                      <HiOutlineUser className="w-5 h-5" />
+                      <span className="text-sm">{user?.email}</span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center justify-center gap-2 text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                    >
+                      <HiOutlineLogout className="w-5 h-5" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <NavLink
+                      to="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-[#6B7280] hover:text-[#0052FF] transition-colors font-medium text-center"
+                    >
+                      Login
+                    </NavLink>
+                    <NavLink
+                      to="/register"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="bg-[#0052FF] text-white px-4 py-2 rounded-lg hover:bg-[#0046E0] transition-colors w-full text-center"
+                    >
+                      Get Started
+                    </NavLink>
+                  </>
+                )}
               </div>
             </div>
           </div>
