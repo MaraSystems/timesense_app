@@ -8,13 +8,19 @@ describe('Homepage', () => {
       cy.contains('TimeSense').should('be.visible')
     })
 
-    it('should display navigation links on desktop', () => {
+    it('should display Home link on desktop', () => {
       cy.contains('Home').should('be.visible')
-      cy.contains('Calendars').should('be.visible')
-      cy.contains('Appointments').should('be.visible')
     })
 
-    it('should display Login and Get Started buttons', () => {
+    it('should not display Calendars and Appointments in navbar when not logged in', () => {
+      // These links should only be visible in navbar when logged in
+      cy.get('nav').within(() => {
+        cy.contains('Calendars').should('not.exist')
+        cy.contains('Appointments').should('not.exist')
+      })
+    })
+
+    it('should display Login and Get Started buttons when not logged in', () => {
       cy.contains('Login').should('be.visible')
       cy.contains('Get Started').should('be.visible')
     })
@@ -30,8 +36,9 @@ describe('Homepage', () => {
       // Mobile menu should now be visible
       cy.get('[data-testid="mobile-menu"]').should('be.visible')
       cy.get('[data-testid="mobile-menu"]').contains('Home').should('be.visible')
-      cy.get('[data-testid="mobile-menu"]').contains('Calendars').should('be.visible')
-      cy.get('[data-testid="mobile-menu"]').contains('Appointments').should('be.visible')
+      // Calendars and Appointments should not be visible when not logged in
+      cy.get('[data-testid="mobile-menu"]').contains('Calendars').should('not.exist')
+      cy.get('[data-testid="mobile-menu"]').contains('Appointments').should('not.exist')
     })
   })
 

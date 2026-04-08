@@ -2,6 +2,8 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useAuth } from "../auth/AuthContext"
+import { Navbar } from "../components/Navbar"
+import { Footer } from "../components/Footer"
 import { Input } from "../components/Input"
 import { PasswordInput } from "../components/PasswordInput"
 import { Button } from "../components/Button"
@@ -12,7 +14,7 @@ export function Register() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({})
-  const { register } = useAuth()
+  const { isAuthenticated, register } = useAuth()
   const navigate = useNavigate()
 
   const validate = () => {
@@ -65,67 +67,71 @@ export function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-xl shadow-sm border border-[#E5EAF2] p-8">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-lg bg-[#0052FF] flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">T</span>
+    <div className="min-h-screen bg-[#F7F9FC] flex flex-col">
+      <Navbar isAuthenticated={isAuthenticated} />
+      <main className="flex-1 flex items-center justify-center px-4 py-12 mt-16">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-xl shadow-sm border border-[#E5EAF2] p-8">
+            <div className="text-center mb-8">
+              <div className="w-12 h-12 rounded-lg bg-[#0052FF] flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">T</span>
+              </div>
+              <h1 className="text-2xl font-bold text-[#1A1A1A]">Create Account</h1>
+              <p className="text-[#6B7280] mt-2">Get started with TimeSense</p>
             </div>
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">Create Account</h1>
-            <p className="text-[#6B7280] mt-2">Get started with TimeSense</p>
+
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+              <Input
+                id="email"
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+                placeholder="you@example.com"
+                data-testid="email-input"
+              />
+
+              <PasswordInput
+                id="password"
+                label="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+                placeholder="At least 8 characters"
+                data-testid="password-input"
+              />
+
+              <PasswordInput
+                id="confirmPassword"
+                label="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={errors.confirmPassword}
+                placeholder="Confirm your password"
+                data-testid="confirm-password-input"
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                isLoading={isLoading}
+                data-testid="register-button"
+              >
+                Create Account
+              </Button>
+            </form>
+
+            <p className="text-center text-sm text-[#6B7280] mt-6">
+              Already have an account?{" "}
+              <Link to="/login" className="text-[#0052FF] hover:underline font-medium">
+                Sign in
+              </Link>
+            </p>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            <Input
-              id="email"
-              label="Email Address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={errors.email}
-              placeholder="you@example.com"
-              data-testid="email-input"
-            />
-
-            <PasswordInput
-              id="password"
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={errors.password}
-              placeholder="At least 8 characters"
-              data-testid="password-input"
-            />
-
-            <PasswordInput
-              id="confirmPassword"
-              label="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              error={errors.confirmPassword}
-              placeholder="Confirm your password"
-              data-testid="confirm-password-input"
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              isLoading={isLoading}
-              data-testid="register-button"
-            >
-              Create Account
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-[#6B7280] mt-6">
-            Already have an account?{" "}
-            <Link to="/login" className="text-[#0052FF] hover:underline font-medium">
-              Sign in
-            </Link>
-          </p>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   )
 }

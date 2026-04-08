@@ -92,14 +92,42 @@ export const getCalendar = async (id: string) => {
   }
 }
 
-export const deleteCalendar = async (id: string, ownerId?: string) => {
+export const deleteCalendar = async (id: string) => {
   const response = await client.deleteCalendar({
     id: BigInt(id),
-    ownerId: ownerId ? BigInt(ownerId) : undefined,
   })
 
   return {
     success: response.success,
     message: response.message,
+  }
+}
+
+export const updateCalendar = async (id: string, data: {
+  title?: string
+  slotDuration?: number
+  liveAt?: string
+  expireAt?: string
+  startTime?: number
+  stopTime?: number
+  weekDays?: { values: number[] }
+  allowOverlap?: boolean
+}) => {
+  const response = await client.updateCalendar({
+    id: BigInt(id),
+    title: data.title,
+    slotDuration: data.slotDuration,
+    liveAt: data.liveAt ? Timestamp.fromDate(new Date(data.liveAt)) : undefined,
+    expireAt: data.expireAt ? Timestamp.fromDate(new Date(data.expireAt)) : undefined,
+    startTime: data.startTime,
+    stopTime: data.stopTime,
+    weekDays: data.weekDays ? { values: data.weekDays.values } : undefined,
+    allowOverlap: data.allowOverlap,
+  })
+
+  return {
+    success: response.success,
+    message: response.message,
+    data: response.data ? toCalendarDisplay(response.data) : undefined,
   }
 }

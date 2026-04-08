@@ -40,22 +40,26 @@ export function Navbar({ isAuthenticated }: NavbarProps) {
             >
               Home
             </NavLink>
-            <NavLink
-              to="/calendars"
-              className={({ isActive }) =>
-                isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
-              }
-            >
-              Calendars
-            </NavLink>
-            <NavLink
-              to="/appointments"
-              className={({ isActive }) =>
-                isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
-              }
-            >
-              Appointments
-            </NavLink>
+            {isAuthenticated && (
+              <>
+                <NavLink
+                  to="/calendars"
+                  className={({ isActive }) =>
+                    isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                  }
+                >
+                  Calendars
+                </NavLink>
+                <NavLink
+                  to="/appointments"
+                  className={({ isActive }) =>
+                    isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                  }
+                >
+                  Appointments
+                </NavLink>
+              </>
+            )}
           </div>
 
           {/* Desktop CTA */}
@@ -115,24 +119,28 @@ export function Navbar({ isAuthenticated }: NavbarProps) {
               >
                 Home
               </NavLink>
-              <NavLink
-                to="/calendars"
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
-                }
-              >
-                Calendars
-              </NavLink>
-              <NavLink
-                to="/appointments"
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
-                }
-              >
-                Appointments
-              </NavLink>
+              {isAuthenticated && (
+                <>
+                  <NavLink
+                    to="/calendars"
+                    onClick={() => setIsMenuOpen(false)}
+                    className={({ isActive }) =>
+                      isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                    }
+                  >
+                    Calendars
+                  </NavLink>
+                  <NavLink
+                    to="/appointments"
+                    onClick={() => setIsMenuOpen(false)}
+                    className={({ isActive }) =>
+                      isActive ? "text-[#0052FF] font-medium" : "text-[#6B7280] hover:text-[#0052FF] transition-colors"
+                    }
+                  >
+                    Appointments
+                  </NavLink>
+                </>
+              )}
               <div className="flex flex-col gap-2 pt-4 border-t border-[#E5EAF2]">
                 {isAuthenticated ? (
                   <>
