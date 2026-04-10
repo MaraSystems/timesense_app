@@ -1,13 +1,18 @@
 import { Recurrence, type Appointment } from "../gen/timesense/v1/appointment_pb"
 import { format } from "date-fns"
 
-// Month days (1-31)
+/**
+ * Day numbers for monthly recurrence (1-31).
+ */
 export const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => ({
   value: i + 1,
   label: String(i + 1),
 }))
 
-// Months (1-12 for Jan-Dec)
+/**
+ * Month options for yearly recurrence patterns.
+ * Values: 1 = January, 2 = February, ..., 12 = December
+ */
 export const MONTHS = [
   { value: 1, label: "Jan" },
   { value: 2, label: "Feb" },
@@ -23,12 +28,18 @@ export const MONTHS = [
   { value: 12, label: "Dec" },
 ]
 
+/**
+ * Recurrence type options for appointments.
+ */
 export const RECURRENCE_OPTIONS = [
   { value: Recurrence.UNSPECIFIED, label: "One-time" },
   { value: Recurrence.WEEKLY, label: "Weekly" },
   { value: Recurrence.MONTHLY, label: "Monthly" },
 ]
 
+/**
+ * Display model for appointment data in the UI.
+ */
 export interface AppointmentDisplay {
   id: string
   calendarId: string
@@ -46,6 +57,9 @@ export interface AppointmentDisplay {
   updatedAt: string
 }
 
+/**
+ * Parameters for creating a new appointment.
+ */
 export interface CreateAppointmentParams {
   calendarId: string
   title: string
@@ -58,6 +72,9 @@ export interface CreateAppointmentParams {
   expireAt: string
 }
 
+/**
+ * Parameters for updating an existing appointment.
+ */
 export interface UpdateAppointmentParams {
   title?: string
   startTime?: number
@@ -69,6 +86,33 @@ export interface UpdateAppointmentParams {
   expireAt?: string
 }
 
+/**
+ * Display model for appointment slot data in the UI.
+ */
+export interface SlotDisplay {
+  startTime: number
+  stopTime: number
+  date: string
+  booked: boolean
+}
+
+/**
+ * Parameters for listing appointments with optional filters.
+ */
+export interface ListAppointmentsParams {
+  limit: number
+  offset: number
+  calendarId?: string
+  bookerId?: string
+  liveAt?: string
+  expireAt?: string
+}
+
+/**
+ * Transforms a protobuf Appointment message to a display-friendly format.
+ * @param appointment - The protobuf Appointment message
+ * @returns The appointment display object with string IDs and formatted dates
+ */
 export function toAppointmentDisplay(appointment: Appointment): AppointmentDisplay {
   const liveAtDate = appointment.liveAt?.toDate()
   const expireAtDate = appointment.expireAt?.toDate()
@@ -93,22 +137,11 @@ export function toAppointmentDisplay(appointment: Appointment): AppointmentDispl
   }
 }
 
-export interface ListAppointmentsParams {
-  limit: number
-  offset: number
-  calendarId?: string
-  bookerId?: string
-  liveAt?: string
-  expireAt?: string
-}
-
-export interface SlotDisplay {
-  startTime: number
-  stopTime: number
-  date: string
-  booked: boolean
-}
-
+/**
+ * Transforms a protobuf Slot message to a display-friendly format.
+ * @param slot - The protobuf Slot message
+ * @returns The slot display object with formatted date
+ */
 export function toSlotDisplay(slot: import("../gen/timesense/v1/slot_pb").Slot): SlotDisplay {
   const slotDate = slot.date?.toDate()
   return {

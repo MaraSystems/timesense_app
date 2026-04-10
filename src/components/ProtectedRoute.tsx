@@ -5,6 +5,12 @@ interface ProtectedRouteProps {
   children: React.ReactNode
 }
 
+/**
+ * Route guard component that requires authentication.
+ * Redirects unauthenticated users to the login page while preserving the intended destination.
+ * Shows a loading spinner while authentication state is being determined.
+ * @param children - Child components to render if authenticated
+ */
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()

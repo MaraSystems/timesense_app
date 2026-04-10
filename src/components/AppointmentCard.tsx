@@ -12,14 +12,32 @@ interface AppointmentCardProps {
   onDelete?: (appointment: AppointmentDisplay) => void
 }
 
+/**
+ * Card component for displaying appointment information in a list view.
+ * Shows appointment title, time, date range, recurrence pattern, and rebook status.
+ * Clicking the card navigates to the appointment detail page.
+ * Edit and delete actions are only visible to the appointment booker.
+ * @param appointment - The appointment data to display
+ * @param currentUserId - ID of the currently logged-in user
+ * @param onDelete - Handler called when delete button is clicked
+ */
 export function AppointmentCard({ appointment, currentUserId, onDelete }: AppointmentCardProps) {
   const navigate = useNavigate()
   const isBooker = currentUserId === appointment.bookerId
+
+  /**
+   * Converts a recurrence enum value to a human-readable label.
+   * @param recurrence - The recurrence type
+   * @returns Human-readable label (One-time, Weekly, or Monthly)
+   */
   const getRecurrenceLabel = (recurrence: Recurrence) => {
     const option = RECURRENCE_OPTIONS.find((opt) => opt.value === recurrence)
     return option?.label || "One-time"
   }
 
+  /**
+   * Navigates to the appointment detail page.
+   */
   const handleCardClick = () => {
     navigate(`/appointments/${appointment.id}`)
   }

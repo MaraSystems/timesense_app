@@ -2,7 +2,11 @@ import { client } from './api'
 import { Timestamp } from '@bufbuild/protobuf'
 import { toCalendarDisplay, toCalendarSlotDisplay, type CreateCalendarParams, type UpdateCalendarParams } from '../models/calendar'
 
-
+/**
+ * Creates a new calendar with the specified configuration.
+ * @param data - The calendar creation parameters
+ * @returns Promise resolving to the created calendar data on success
+ */
 export const createCalendar = async (data: CreateCalendarParams) => {
   const response = await client.createCalendar({
     title: data.title,
@@ -22,6 +26,11 @@ export const createCalendar = async (data: CreateCalendarParams) => {
   }
 }
 
+/**
+ * Lists calendars with optional filtering and pagination.
+ * @param params - Optional filtering parameters including ownerId, limit, and offset
+ * @returns Promise resolving to a paginated list of calendars
+ */
 export const listCalendars = async (params?: { ownerId?: string; limit?: number; offset?: number }) => {
   const response = await client.listCalendars({
     ownerId: params?.ownerId ? BigInt(params.ownerId) : undefined,
@@ -41,6 +50,11 @@ export const listCalendars = async (params?: { ownerId?: string; limit?: number;
   }
 }
 
+/**
+ * Retrieves a calendar by its ID.
+ * @param id - The calendar ID
+ * @returns Promise resolving to the calendar data on success
+ */
 export const getCalendar = async (id: string) => {
   const response = await client.getCalendar({
     id: BigInt(id),
@@ -53,6 +67,11 @@ export const getCalendar = async (id: string) => {
   }
 }
 
+/**
+ * Deletes a calendar by its ID.
+ * @param id - The calendar ID to delete
+ * @returns Promise resolving to success status and message
+ */
 export const deleteCalendar = async (id: string) => {
   const response = await client.deleteCalendar({
     id: BigInt(id),
@@ -64,6 +83,12 @@ export const deleteCalendar = async (id: string) => {
   }
 }
 
+/**
+ * Updates an existing calendar with new configuration.
+ * @param id - The calendar ID to update
+ * @param data - The update parameters
+ * @returns Promise resolving to the updated calendar data on success
+ */
 export const updateCalendar = async (id: string, data: UpdateCalendarParams) => {
   const response = await client.updateCalendar({
     id: BigInt(id),
@@ -84,6 +109,12 @@ export const updateCalendar = async (id: string, data: UpdateCalendarParams) => 
   }
 }
 
+/**
+ * Retrieves available time slots for a calendar within a specified date range.
+ * @param id - The calendar ID
+ * @param params - Optional date range parameters (liveAt, expireAt)
+ * @returns Promise resolving to a paginated list of calendar slots
+ */
 export const getCalendarSlots = async (id: string, params?: { liveAt?: string; expireAt?: string }) => {
   const response = await client.getCalendarSlots({
     id: BigInt(id),

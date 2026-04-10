@@ -2,6 +2,9 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { login as loginService, createUser } from '../services/user.service'
 import type { UserDisplay } from '../models/user'
 
+/**
+ * Authentication context type definition.
+ */
 interface AuthContextType {
   user: UserDisplay | null
   isLoading: boolean
@@ -16,11 +19,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const AUTH_TOKEN_KEY = 'auth_token'
 const USER_KEY = 'user_data'
 
+/**
+ * Provider component that manages authentication state.
+ * Restores user session from localStorage on mount and handles login/logout events.
+ * @param children - Child components to wrap with auth context
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserDisplay | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    /**
+     * Restores user session from localStorage on initial load.
+     */
     const loadUser = async () => {
       // Try to restore user from localStorage
       const storedUser = localStorage.getItem(USER_KEY)
@@ -39,6 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     loadUser()
 
+    /**
+     * Handles logout events dispatched by the API interceptor.
+     */
     const handleLogout = () => {
       setUser(null)
     }
@@ -47,6 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth:logout', handleLogout)
   }, [])
 
+  /**
+   * Authenticates a user with email and password.
+   * @param email - User's email address
+   * @param password - User's password
+   * @throws Error if login fails
+   */
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
@@ -63,6 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /**
+   * Creates a new user account.
+   * @param email - User's email address
+   * @param password - User's password
+   * @throws Error with message 'REGISTRATION_SUCCESS' on successful registration
+   */
   const register = async (email: string, password: string) => {
     setIsLoading(true)
     try {
@@ -79,6 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /**
+   * Clears the user session from localStorage and state.
+   */
   const logout = () => {
     localStorage.removeItem(AUTH_TOKEN_KEY)
     localStorage.removeItem(USER_KEY)
@@ -101,6 +130,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * Hook to access authentication context.
+ * Must be used within an AuthProvider.
+ * @returns Authentication context with user state and auth methods
+ * @throws Error if used outside of AuthProvider
+ */
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {

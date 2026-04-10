@@ -5,6 +5,16 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   error?: string
 }
 
+/**
+ * Select dropdown component with label and error state support.
+ * @param label - Optional label text
+ * @param error - Optional error message to display
+ * @param className - Additional CSS classes
+ * @param id - Select element ID
+ * @param children - Option elements as children
+ * @param ref - Forward ref to the select element
+ * @param props - Additional select HTML attributes
+ */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, className = "", id, children, ...props }, ref) => {
     return (

@@ -8,6 +8,17 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "typ
   "data-testid"?: string
 }
 
+/**
+ * Single checkbox component with custom styling.
+ * @param label - Checkbox label text
+ * @param id - Checkbox element ID
+ * @param error - Optional error message to display
+ * @param checked - Whether checkbox is checked
+ * @param onChange - Change handler
+ * @param className - Additional CSS classes
+ * @param testId - Data test ID for testing
+ * @param props - Additional input HTML attributes
+ */
 export function Checkbox({
   label,
   id,
@@ -65,6 +76,15 @@ interface CheckboxGroupProps {
   "data-testid"?: string
 }
 
+/**
+ * Group of checkboxes for multi-select functionality.
+ * @param label - Group label text
+ * @param options - Array of checkbox options with value and label
+ * @param selected - Array of currently selected values
+ * @param onChange - Handler called with updated selected values
+ * @param error - Optional error message to display
+ * @param testId - Data test ID for testing
+ */
 export function CheckboxGroup({
   label,
   options,
@@ -73,6 +93,10 @@ export function CheckboxGroup({
   error,
   "data-testid": testId,
 }: CheckboxGroupProps) {
+  /**
+   * Toggles a value in the selection.
+   * @param value - The value to toggle
+   */
   const handleToggle = (value: number) => {
     if (selected.includes(value)) {
       onChange(selected.filter((v) => v !== value))

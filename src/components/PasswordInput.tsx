@@ -9,6 +9,16 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
   "data-testid"?: string
 }
 
+/**
+ * Password input component with visibility toggle.
+ * Displays a lock icon on the left and an eye icon to toggle password visibility.
+ * @param label - Input label text
+ * @param id - Input element ID
+ * @param error - Optional error message to display
+ * @param className - Additional CSS classes
+ * @param testId - Data test ID for testing
+ * @param props - Additional input HTML attributes
+ */
 export function PasswordInput({
   label,
   id,

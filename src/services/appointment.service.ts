@@ -3,6 +3,11 @@ import { Timestamp } from '@bufbuild/protobuf'
 import { Recurrence } from '../gen/timesense/v1/appointment_pb'
 import { toAppointmentDisplay, toSlotDisplay, type CreateAppointmentParams, type UpdateAppointmentParams, type ListAppointmentsParams } from '../models/appointment'
 
+/**
+ * Creates a new appointment.
+ * @param data - The appointment creation parameters
+ * @returns Promise resolving to the created appointment data on success
+ */
 export const createAppointment = async (data: CreateAppointmentParams) => {
   const response = await client.createAppointment({
     calendarId: BigInt(data.calendarId),
@@ -23,6 +28,11 @@ export const createAppointment = async (data: CreateAppointmentParams) => {
   }
 }
 
+/**
+ * Retrieves an appointment by its ID.
+ * @param id - The appointment ID
+ * @returns Promise resolving to the appointment data on success
+ */
 export const getAppointment = async (id: string) => {
   const response = await client.getAppointment({
     id: BigInt(id),
@@ -35,6 +45,11 @@ export const getAppointment = async (id: string) => {
   }
 }
 
+/**
+ * Lists appointments with optional filtering and pagination.
+ * @param params - Filtering parameters including calendarId, bookerId, dates, and pagination
+ * @returns Promise resolving to a list of appointments
+ */
 export const listAppointments = async (params: ListAppointmentsParams) => {
   const response = await client.listAppointments({
     calendarId: params.calendarId ? BigInt(params.calendarId) : undefined,
@@ -52,6 +67,12 @@ export const listAppointments = async (params: ListAppointmentsParams) => {
   }
 }
 
+/**
+ * Updates an existing appointment.
+ * @param id - The appointment ID to update
+ * @param data - The update parameters
+ * @returns Promise resolving to the updated appointment data on success
+ */
 export const updateAppointment = async (id: string, data: UpdateAppointmentParams) => {
   const response = await client.updateAppointment({
     id: BigInt(id),
@@ -72,6 +93,11 @@ export const updateAppointment = async (id: string, data: UpdateAppointmentParam
   }
 }
 
+/**
+ * Deletes an appointment by its ID.
+ * @param id - The appointment ID to delete
+ * @returns Promise resolving to success status and message
+ */
 export const deleteAppointment = async (id: string) => {
   const response = await client.deleteAppointment({
     id: BigInt(id),
@@ -83,6 +109,12 @@ export const deleteAppointment = async (id: string) => {
   }
 }
 
+/**
+ * Retrieves appointment time slots within a specified date range.
+ * @param id - The appointment ID
+ * @param params - Optional date range parameters (liveAt, expireAt)
+ * @returns Promise resolving to a paginated list of appointment slots
+ */
 export const getAppointmentSlots = async (id: string, params?: { liveAt?: string; expireAt?: string }) => {
   const response = await client.getAppointmentSlots({
     id: BigInt(id),

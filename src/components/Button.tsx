@@ -10,6 +10,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   "data-testid"?: string
 }
 
+/**
+ * Reusable button component with multiple variants and sizes.
+ * @param children - Button content
+ * @param variant - Visual style variant (primary, secondary, outline)
+ * @param size - Button size (sm, md, lg)
+ * @param fullWidth - Whether button takes full width of container
+ * @param isLoading - Shows loading spinner when true
+ * @param icon - Optional icon to display before children
+ * @param className - Additional CSS classes
+ * @param disabled - Whether button is disabled
+ * @param testId - Data test ID for testing
+ * @param props - Additional button HTML attributes
+ */
 export function Button({
   children,
   variant = "primary",

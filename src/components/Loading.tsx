@@ -1,3 +1,7 @@
+/**
+ * Full-page loading spinner component.
+ * Displays a centered animated spinner with "Loading..." text.
+ */
 export function Loading() {
     return (
         <main className="flex-1 flex items-center justify-center mt-16">

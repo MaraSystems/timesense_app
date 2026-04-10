@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom"
 
+/**
+ * Footer component with navigation links and contact information.
+ * Displays brand information, quick links, action links, and contact details.
+ */
 export function Footer() {
   return (
     <footer className="bg-[#001F54] text-white py-12">

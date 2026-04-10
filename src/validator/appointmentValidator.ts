@@ -1,6 +1,9 @@
 import type { Dispatch, SetStateAction } from "react"
 import { Recurrence } from "../gen/timesense/v1/appointment_pb"
 
+/**
+ * Form data for appointment creation and editing.
+ */
 export interface AppointmentFormData {
   title: string
   date: string
@@ -11,6 +14,9 @@ export interface AppointmentFormData {
   months: number[]
 }
 
+/**
+ * Validation errors for appointment form fields.
+ */
 export interface AppointmentFormErrors {
   title?: string
   date?: string
@@ -20,6 +26,12 @@ export interface AppointmentFormErrors {
   months?: string
 }
 
+/**
+ * Validates appointment form data and sets error messages.
+ * @param formData - The form data to validate
+ * @param setErrors - State setter for error messages
+ * @returns True if form is valid, false otherwise
+ */
 export const ValidateAppointment = (formData: AppointmentFormData, setErrors: Dispatch<SetStateAction<AppointmentFormErrors>>): boolean => {
     const newErrors: AppointmentFormErrors = {}
 

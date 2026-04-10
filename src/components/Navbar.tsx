@@ -7,11 +7,20 @@ interface NavbarProps {
   isAuthenticated: boolean
 }
 
+/**
+ * Main navigation bar component.
+ * Displays the logo, navigation links, and user authentication state.
+ * Supports both desktop and mobile layouts with a responsive hamburger menu.
+ * @param isAuthenticated - Whether the user is currently authenticated
+ */
 export function Navbar({ isAuthenticated }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
+  /**
+   * Handles user logout by clearing auth state and redirecting to home.
+   */
   const handleLogout = () => {
     logout()
     navigate("/")

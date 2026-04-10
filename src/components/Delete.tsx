@@ -8,6 +8,14 @@ interface DeleteParams {
     setShowDeleteConfirm: (flag: SetStateAction<boolean>) => void
 }
 
+/**
+ * Delete confirmation modal component.
+ * Displays a confirmation dialog before deleting an entity.
+ * @param title - The title of the entity to delete
+ * @param entityName - The type of entity (defaults to "Calendar")
+ * @param handleDelete - Handler function for deletion, receives a loading state setter
+ * @param setShowDeleteConfirm - State setter to close the modal
+ */
 export function Delete(params: DeleteParams) {
     const [isDeleting, setIsDeleting] = useState(false)
     const entityName = params.entityName || "Calendar"

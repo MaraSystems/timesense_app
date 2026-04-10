@@ -2,6 +2,9 @@ import type { Calendar } from "../gen/timesense/v1/calendar_pb"
 import type { Slot } from "../gen/timesense/v1/slot_pb"
 import { format } from "date-fns"
 
+/**
+ * Display model for calendar data in the UI.
+ */
 export interface CalendarDisplay {
   id: string
   ownerId: string
@@ -16,6 +19,9 @@ export interface CalendarDisplay {
   updatedAt: string
 }
 
+/**
+ * Display model for calendar slot data in the UI.
+ */
 export interface CalendarSlotDisplay {
   startTime: number
   stopTime: number
@@ -23,6 +29,9 @@ export interface CalendarSlotDisplay {
   booked: boolean
 }
 
+/**
+ * Parameters for creating a new calendar.
+ */
 export interface CreateCalendarParams {
   title: string
   slotDuration: number
@@ -34,6 +43,9 @@ export interface CreateCalendarParams {
   allowOverlap: boolean
 }
 
+/**
+ * Parameters for updating an existing calendar.
+ */
 export interface UpdateCalendarParams {
   title?: string
   slotDuration?: number
@@ -45,6 +57,10 @@ export interface UpdateCalendarParams {
   allowOverlap?: boolean
 }
 
+/**
+ * Weekday options for calendar configuration.
+ * Values follow JavaScript standard: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+ */
 export const WEEKDAYS = [
   { value: 0, label: "Sun" },
   { value: 1, label: "Mon" },
@@ -55,6 +71,9 @@ export const WEEKDAYS = [
   { value: 6, label: "Sat" },
 ]
 
+/**
+ * Available slot duration options for calendar configuration.
+ */
 export const SLOT_DURATIONS = [
   { value: 15, label: "15 minutes" },
   { value: 30, label: "30 minutes" },
@@ -62,6 +81,11 @@ export const SLOT_DURATIONS = [
   { value: 60, label: "1 hour" },
 ]
 
+/**
+ * Transforms a protobuf Calendar message to a display-friendly format.
+ * @param calendar - The protobuf Calendar message
+ * @returns The calendar display object with string IDs and formatted dates
+ */
 export function toCalendarDisplay(calendar: Calendar): CalendarDisplay {
   const liveAtDate = calendar.liveAt?.toDate()
   const expireAtDate = calendar.expireAt?.toDate()
@@ -83,6 +107,11 @@ export function toCalendarDisplay(calendar: Calendar): CalendarDisplay {
   }
 }
 
+/**
+ * Transforms a protobuf Slot message to a display-friendly format.
+ * @param slot - The protobuf Slot message
+ * @returns The slot display object with formatted date
+ */
 export function toCalendarSlotDisplay(slot: Slot): CalendarSlotDisplay {
   const slotDate = slot.date?.toDate()
   return {

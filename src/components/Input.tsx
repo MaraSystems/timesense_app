@@ -8,6 +8,16 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix
   "data-testid"?: string
 }
 
+/**
+ * Reusable input component with label and error state support.
+ * @param label - Input label text
+ * @param id - Input element ID (also used for label association)
+ * @param error - Optional error message to display
+ * @param icon - Optional icon to display on the left side
+ * @param className - Additional CSS classes
+ * @param testId - Data test ID for testing
+ * @param props - Additional input HTML attributes
+ */
 export function Input({
   label,
   id,

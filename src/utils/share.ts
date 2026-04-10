@@ -1,5 +1,10 @@
 import { toast } from "react-toastify"
 
+/**
+ * Copies a shareable URL to the clipboard.
+ * Constructs a full URL from the origin and the provided path.
+ * @param url - The relative URL path to share
+ */
 export const handleShare = async (url: string) => {
     if (!url) return
     const shareUrl = `${window.location.origin}/${url}`;
