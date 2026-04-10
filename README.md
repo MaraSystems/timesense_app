@@ -123,12 +123,39 @@ src/
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
+- [Buf](https://buf.build/docs/installation) - Protocol Buffers CLI tool for code generation
+
+### Project Structure
+
+This frontend project must be placed alongside the API project for `buf generate` to work correctly:
+
+```
+timesense/
+├── timesense_app/     # This frontend project
+│   ├── src/
+│   ├── package.json
+│   └── buf.gen.yaml
+└── api/               # Backend API project (contains .proto files)
+    ├── proto/
+    └── ...
+```
+
+The `buf generate` command reads protobuf definitions from the API project and generates TypeScript types into `src/gen/`.
 
 ### Installation
 
 ```bash
+# Install Buf (macOS)
+brew install bufbuild/buf/buf
+
+# Install Buf (Linux/Windows - see https://buf.build/docs/installation)
+# npm install -g @bufbuild/buf
+
 # Install dependencies
 npm install
+
+# Generate protobuf types (run from timesense_app directory)
+buf generate
 
 # Start development server
 npm run dev
