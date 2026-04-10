@@ -39,15 +39,12 @@ export function EditCalendar() {
         const response = await getCalendar(id)
         if (response.success && response.data) {
           const cal = response.data
-          // Convert ISO strings to datetime-local format
-          const liveAtDate = new Date(cal.liveAt)
-          const expireAtDate = new Date(cal.expireAt)
-
+          // Use the calendar's dates directly (already in YYYY-MM-DD format)
           setFormData({
             title: cal.title,
             slotDuration: cal.slotDuration,
-            liveAt: liveAtDate.toISOString().slice(0, 16),
-            expireAt: expireAtDate.toISOString().slice(0, 16),
+            liveAt: cal.liveAt.split("T")[0],
+            expireAt: cal.expireAt.split("T")[0],
             startTime: cal.startTime,
             stopTime: cal.stopTime,
             weekDays: cal.weekDays.values,

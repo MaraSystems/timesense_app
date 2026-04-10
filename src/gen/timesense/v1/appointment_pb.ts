@@ -175,6 +175,11 @@ export class Appointment extends Message<Appointment> {
    */
   updatedAt?: Timestamp;
 
+  /**
+   * @generated from field: bool rebook = 14;
+   */
+  rebook = false;
+
   constructor(data?: PartialMessage<Appointment>) {
     super();
     proto3.util.initPartial(data, this);
@@ -196,6 +201,7 @@ export class Appointment extends Message<Appointment> {
     { no: 11, name: "expire_at", kind: "message", T: Timestamp },
     { no: 12, name: "created_at", kind: "message", T: Timestamp },
     { no: 13, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 14, name: "rebook", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Appointment {

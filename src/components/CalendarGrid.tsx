@@ -12,7 +12,8 @@ import {
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
-  isValid
+  isValid,
+  getDay
 } from "date-fns"
 
 export function CalendarGrid({
@@ -20,11 +21,13 @@ export function CalendarGrid({
   onDateSelect,
   minDate,
   maxDate,
+  availableWeekdays,
 }: {
   selectedDate: string
   onDateSelect: (date: string) => void
   minDate?: string
   maxDate?: string
+  availableWeekdays?: number[] // 0=Sun, 1=Mon, ..., 6=Sat
 }) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     // Start from the calendar's live date if it's in the future
@@ -47,6 +50,10 @@ export function CalendarGrid({
     const dateStr = formatDateToString(date)
     if (minDate && dateStr < minDate) return true
     if (maxDate && dateStr > maxDate) return true
+    // Check if the weekday is available
+    if (availableWeekdays && availableWeekdays.length > 0) {
+      if (!availableWeekdays.includes(getDay(date))) return true
+    }
     return false
   }
 

@@ -300,6 +300,7 @@ export function EditAppointment() {
                   }}
                   minDate={getMinDate()}
                   maxDate={getMaxDate()}
+                  availableWeekdays={calendar?.weekDays.values}
                 />
               </div>
               {errors.date && (
@@ -376,57 +377,35 @@ export function EditAppointment() {
           {(formData.recurrence === Recurrence.WEEKLY || formData.recurrence === Recurrence.MONTHLY) && calendar && (
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
-                Select Time
+                Select Time Slot
               </label>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-[#6B7280] mb-1">Start Time</label>
-                  <select
-                    value={formData.startTime ?? ""}
-                    onChange={(e) => setFormData((prev) => ({
-                      ...prev,
-                      startTime: e.target.value ? Number(e.target.value) : null,
-                    }))}
-                    className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
-                    data-testid="start-time-select"
-                  >
-                    <option value="">Select start time</option>
-                    {Array.from({ length: Math.ceil((calendar.stopTime - calendar.startTime) / calendar.slotDuration) }, (_, i) => {
-                      const startTime = calendar.startTime + (i * calendar.slotDuration)
-                      const stopTime = formData.stopTime ?? calendar.stopTime
-                      if (stopTime && startTime >= stopTime) return null
-                      return (
-                        <option key={startTime} value={startTime}>
-                          {formatTime(startTime)}
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#6B7280] mb-1">End Time</label>
-                  <select
-                    value={formData.stopTime ?? ""}
-                    onChange={(e) => setFormData((prev) => ({
-                      ...prev,
-                      stopTime: e.target.value ? Number(e.target.value) : null,
-                    }))}
-                    className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
-                    data-testid="end-time-select"
-                  >
-                    <option value="">Select end time</option>
-                    {Array.from({ length: Math.ceil((calendar.stopTime - calendar.startTime) / calendar.slotDuration) }, (_, i) => {
-                      const startTime = formData.startTime ?? calendar.startTime
-                      const stopTime = calendar.startTime + ((i + 1) * calendar.slotDuration)
-                      if (stopTime <= startTime) return null
-                      return (
-                        <option key={stopTime} value={stopTime}>
-                          {formatTime(stopTime)}
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {Array.from({ length: Math.ceil((calendar.stopTime - calendar.startTime) / calendar.slotDuration) }, (_, i) => {
+                  const slotStart = calendar.startTime + (i * calendar.slotDuration)
+                  const slotStop = slotStart + calendar.slotDuration
+                  const isSelected = formData.startTime === slotStart && formData.stopTime === slotStop
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          startTime: slotStart,
+                          stopTime: slotStop,
+                        }))
+                      }}
+                      className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                        isSelected
+                          ? "bg-[#0052FF] text-white"
+                          : "bg-[#F7F9FC] text-[#1A1A1A] hover:bg-[#E5EAF2] border border-[#E5EAF2]"
+                      }`}
+                      data-testid={`recurring-slot-${slotStart}-${slotStop}`}
+                    >
+                      {formatTime(slotStart)} - {formatTime(slotStop)}
+                    </button>
+                  )
+                })}
               </div>
               {errors.timeSlot && (
                 <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="timeSlot-error">
@@ -437,13 +416,13 @@ export function EditAppointment() {
           )}
 
           {/* Days Selection - Weekly */}
-          {formData.recurrence === Recurrence.WEEKLY && (
+          {formData.recurrence === Recurrence.WEEKLY && calendar && (
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 Select Weekdays
               </label>
               <div className="flex flex-wrap gap-3">
-                {WEEKDAYS.map((day) => (
+                {WEEKDAYS.filter((day) => calendar.weekDays.values.includes(day.value)).map((day) => (
                   <button
                     key={day.value}
                     type="button"
@@ -464,6 +443,11 @@ export function EditAppointment() {
                   </button>
                 ))}
               </div>
+              {errors.weekDays && (
+                <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="weekDays-error">
+                  {errors.weekDays}
+                </p>
+              )}
             </div>
           )}
 

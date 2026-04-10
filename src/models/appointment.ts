@@ -41,6 +41,7 @@ export interface AppointmentDisplay {
   recurrence: Recurrence
   liveAt: string
   expireAt: string
+  rebook: boolean
   createdAt: string
   updatedAt: string
 }
@@ -86,6 +87,7 @@ export function toAppointmentDisplay(appointment: Appointment): AppointmentDispl
     recurrence: appointment.recurrence,
     liveAt: liveAtDate ? format(liveAtDate, "yyyy-MM-dd") : '',
     expireAt: expireAtDate ? format(expireAtDate, "yyyy-MM-dd") : '',
+    rebook: appointment.rebook,
     createdAt: createdAtDate ? format(createdAtDate, "yyyy-MM-dd'T'HH:mm:ss") : '',
     updatedAt: updatedAtDate ? format(updatedAtDate, "yyyy-MM-dd'T'HH:mm:ss") : '',
   }
