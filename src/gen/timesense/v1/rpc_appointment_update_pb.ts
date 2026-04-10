@@ -17,47 +17,42 @@ export class UpdateAppointmentRequest extends Message<UpdateAppointmentRequest> 
   id = protoInt64.zero;
 
   /**
-   * @generated from field: int64 booker_id = 2;
-   */
-  bookerId = protoInt64.zero;
-
-  /**
-   * @generated from field: optional string title = 3;
+   * @generated from field: optional string title = 2;
    */
   title?: string;
 
   /**
-   * @generated from field: optional int32 start_time = 4;
+   * @generated from field: optional int32 start_time = 3;
    */
   startTime?: number;
 
   /**
-   * @generated from field: optional int32 stop_time = 5;
+   * @generated from field: optional int32 stop_time = 4;
    */
   stopTime?: number;
 
   /**
-   * @generated from field: optional timesense.v1.Days days = 6;
+   * @generated from field: optional timesense.v1.Days days = 5;
    */
   days?: Days;
 
   /**
-   * @generated from field: optional timesense.v1.Recurrence recurrence = 7;
+   * @generated from field: optional timesense.v1.Recurrence recurrence = 6;
    */
   recurrence?: Recurrence;
 
   /**
-   * @generated from field: optional timesense.v1.Months months = 8;
+   * @generated from field: optional timesense.v1.Months months = 7;
    */
   months?: Months;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp live_at = 9;
+   * @generated from field: optional google.protobuf.Timestamp live_at = 8;
    */
   liveAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp expire_at = 10;
+   * @generated from field: optional google.protobuf.Timestamp expire_at = 9;
    */
   expireAt?: Timestamp;
 
@@ -70,15 +65,14 @@ export class UpdateAppointmentRequest extends Message<UpdateAppointmentRequest> 
   static readonly typeName = "timesense.v1.UpdateAppointmentRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "booker_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 4, name: "start_time", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
-    { no: 5, name: "stop_time", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
-    { no: 6, name: "days", kind: "message", T: Days, opt: true },
-    { no: 7, name: "recurrence", kind: "enum", T: proto3.getEnumType(Recurrence), opt: true },
-    { no: 8, name: "months", kind: "message", T: Months, opt: true },
-    { no: 9, name: "live_at", kind: "message", T: Timestamp, opt: true },
-    { no: 10, name: "expire_at", kind: "message", T: Timestamp, opt: true },
+    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 3, name: "start_time", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 4, name: "stop_time", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 5, name: "days", kind: "message", T: Days, opt: true },
+    { no: 6, name: "recurrence", kind: "enum", T: proto3.getEnumType(Recurrence), opt: true },
+    { no: 7, name: "months", kind: "message", T: Months, opt: true },
+    { no: 8, name: "live_at", kind: "message", T: Timestamp, opt: true },
+    { no: 9, name: "expire_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAppointmentRequest {

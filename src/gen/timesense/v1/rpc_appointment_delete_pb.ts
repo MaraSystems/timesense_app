@@ -15,11 +15,6 @@ export class DeleteAppointmentRequest extends Message<DeleteAppointmentRequest> 
    */
   id = protoInt64.zero;
 
-  /**
-   * @generated from field: int64 booker_id = 2;
-   */
-  bookerId = protoInt64.zero;
-
   constructor(data?: PartialMessage<DeleteAppointmentRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -29,7 +24,6 @@ export class DeleteAppointmentRequest extends Message<DeleteAppointmentRequest> 
   static readonly typeName = "timesense.v1.DeleteAppointmentRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "booker_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppointmentRequest {

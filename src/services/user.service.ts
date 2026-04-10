@@ -1,30 +1,8 @@
 import { client } from './api'
 import type { User } from '../gen/timesense/v1/user_pb'
+import { toUserDisplay, type AuthResponse, type RegisterRequest, type RegisterResponse } from '../models/user'
 
-export interface UserDisplay {
-  id: string
-  email: string
-  createdAt: string
-}
-
-function toUserDisplay(user: User): UserDisplay {
-  return {
-    id: user.id.toString(),
-    email: user.email,
-    createdAt: user.createdAt?.toDate()?.toISOString() || '',
-  }
-}
-
-export interface AuthResponse {
-  success: boolean
-  message: string
-  data?: {
-    user: UserDisplay
-    accessToken: string
-  }
-}
-
-export const createUser = async (email: string, password: string): Promise<{ success: boolean; message: string; data?: UserDisplay }> => {
+export const createUser = async (email: string, password: string): Promise<RegisterResponse> => {
   const response = await client.createUser({ email, password })
 
   if (response.success && response.data) {
@@ -41,8 +19,8 @@ export const createUser = async (email: string, password: string): Promise<{ suc
   }
 }
 
-export const login = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await client.login({ email, password })
+export const login = async (params: RegisterRequest): Promise<AuthResponse> => {
+  const response = await client.login(params)
   if (response.success && response.data) {
     return {
       success: true,

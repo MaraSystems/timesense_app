@@ -1,48 +1,9 @@
 import { client } from './api'
 import { Timestamp } from '@bufbuild/protobuf'
-import type { Calendar } from '../gen/timesense/v1/calendar_pb'
+import { toCalendarDisplay, toCalendarSlotDisplay, type CreateCalendarParams, type UpdateCalendarParams } from '../models/calendar'
 
-// Helper to convert Calendar from protobuf to display format
-export interface CalendarDisplay {
-  id: string
-  ownerId: string
-  title: string
-  slotDuration: number
-  liveAt: string
-  expireAt: string
-  startTime: number
-  stopTime: number
-  weekDays: { values: number[] }
-  createdAt: string
-  updatedAt: string
-}
 
-function toCalendarDisplay(calendar: Calendar): CalendarDisplay {
-  return {
-    id: calendar.id.toString(),
-    ownerId: calendar.ownerId.toString(),
-    title: calendar.title,
-    slotDuration: calendar.slotDuration,
-    liveAt: calendar.liveAt?.toDate()?.toISOString() || '',
-    expireAt: calendar.expireAt?.toDate()?.toISOString() || '',
-    startTime: calendar.startTime,
-    stopTime: calendar.stopTime,
-    weekDays: { values: calendar.weekDays?.values || [] },
-    createdAt: calendar.createdAt?.toDate()?.toISOString() || '',
-    updatedAt: calendar.updatedAt?.toDate()?.toISOString() || '',
-  }
-}
-
-export const createCalendar = async (data: {
-  title: string
-  slotDuration: number
-  liveAt: string
-  expireAt: string
-  startTime: number
-  stopTime: number
-  weekDays: { values: number[] }
-  allowOverlap: boolean
-}) => {
+export const createCalendar = async (data: CreateCalendarParams) => {
   const response = await client.createCalendar({
     title: data.title,
     slotDuration: data.slotDuration,
@@ -103,16 +64,7 @@ export const deleteCalendar = async (id: string) => {
   }
 }
 
-export const updateCalendar = async (id: string, data: {
-  title?: string
-  slotDuration?: number
-  liveAt?: string
-  expireAt?: string
-  startTime?: number
-  stopTime?: number
-  weekDays?: { values: number[] }
-  allowOverlap?: boolean
-}) => {
+export const updateCalendar = async (id: string, data: UpdateCalendarParams) => {
   const response = await client.updateCalendar({
     id: BigInt(id),
     title: data.title,
@@ -129,5 +81,22 @@ export const updateCalendar = async (id: string, data: {
     success: response.success,
     message: response.message,
     data: response.data ? toCalendarDisplay(response.data) : undefined,
+  }
+}
+
+export const getCalendarSlots = async (id: string, params?: { liveAt?: string; expireAt?: string }) => {
+  const response = await client.getCalendarSlots({
+    id: BigInt(id),
+    liveAt: params?.liveAt ? Timestamp.fromDate(new Date(params.liveAt)) : undefined,
+    expireAt: params?.expireAt ? Timestamp.fromDate(new Date(params.expireAt)) : undefined,
+  })
+
+  return {
+    success: response.success,
+    message: response.message,
+    data: response.data?.data ? {
+      data: response.data.data.map(toCalendarSlotDisplay),
+      next: response.data.next || false,
+    } : undefined,
   }
 }

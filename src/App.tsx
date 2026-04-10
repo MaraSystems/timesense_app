@@ -11,6 +11,10 @@ import { Calendars } from "./pages/Calendars"
 import { CalendarView } from "./pages/CalendarView"
 import { EditCalendar } from "./pages/EditCalendar"
 import { NewCalendar } from "./pages/NewCalendar"
+import { NewAppointment } from "./pages/NewAppointment"
+import { Appointments } from "./pages/Appointments"
+import { EditAppointment } from "./pages/EditAppointment"
+import { CalendarAppointments } from "./pages/CalendarAppointments"
 
 function App() {
   return (
@@ -53,8 +57,38 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/appointments" element={<NotFound />} />
-            <Route path="/appointments/new" element={<NotFound />} />
+            <Route
+              path="/calendars/:id/appointments"
+              element={
+                <ProtectedRoute>
+                  <CalendarAppointments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appointments/new"
+              element={
+                <ProtectedRoute>
+                  <NewAppointment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appointments"
+              element={
+                <ProtectedRoute>
+                  <Appointments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appointments/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <EditAppointment />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

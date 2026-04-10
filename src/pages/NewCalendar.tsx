@@ -8,94 +8,29 @@ import { Footer } from "../components/Footer"
 import { Input } from "../components/Input"
 import { Button } from "../components/Button"
 import { CheckboxGroup } from "../components/Checkbox"
-
-const WEEKDAYS = [
-  { value: 1, label: "Mon" },
-  { value: 2, label: "Tue" },
-  { value: 3, label: "Wed" },
-  { value: 4, label: "Thu" },
-  { value: 5, label: "Fri" },
-  { value: 6, label: "Sat" },
-  { value: 7, label: "Sun" },
-]
-
-const SLOT_DURATIONS = [
-  { value: 15, label: "15 minutes" },
-  { value: 30, label: "30 minutes" },
-  { value: 45, label: "45 minutes" },
-  { value: 60, label: "1 hour" },
-]
-
-interface FormData {
-  title: string
-  slotDuration: number
-  liveAt: string
-  expireAt: string
-  startTime: number
-  stopTime: number
-  weekDays: number[]
-}
-
-interface FormErrors {
-  title?: string
-  slotDuration?: string
-  liveAt?: string
-  expireAt?: string
-  startTime?: string
-  stopTime?: string
-  weekDays?: string
-}
+import { ValidateCalendar, type CalendarFormData, type CalendarFormErrors } from "../validator/calendarValidator"
+import { SLOT_DURATIONS, WEEKDAYS } from "../models/calendar"
 
 export function NewCalendar() {
-  const { user, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CalendarFormData>({
     title: "",
     slotDuration: 30,
     liveAt: "",
     expireAt: "",
-    startTime: 9,
-    stopTime: 17,
+    startTime: 9*60,
+    stopTime: 17*60,
     weekDays: [1, 2, 3, 4, 5], // Default to weekdays
   })
-  const [errors, setErrors] = useState<FormErrors>({})
+  const [errors, setErrors] = useState<CalendarFormErrors>({})
 
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required"
-    }
-
-    if (!formData.liveAt) {
-      newErrors.liveAt = "Start date is required"
-    }
-
-    if (!formData.expireAt) {
-      newErrors.expireAt = "End date is required"
-    }
-
-    if (formData.liveAt && formData.expireAt && formData.liveAt >= formData.expireAt) {
-      newErrors.expireAt = "End date must be after start date"
-    }
-
-    if (formData.startTime >= formData.stopTime) {
-      newErrors.stopTime = "End hour must be after start hour"
-    }
-
-    if (formData.weekDays.length === 0) {
-      newErrors.weekDays = "Select at least one day"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validate()) return
+    if (!ValidateCalendar(formData, setErrors)) return
 
     setIsLoading(true)
 
@@ -174,7 +109,7 @@ export function NewCalendar() {
             <Input
               id="liveAt"
               label="Availability Starts"
-              type="datetime-local"
+              type="date"
               value={formData.liveAt}
               onChange={(e) => setFormData((prev) => ({ ...prev, liveAt: e.target.value }))}
               error={errors.liveAt}
@@ -183,7 +118,7 @@ export function NewCalendar() {
             <Input
               id="expireAt"
               label="Availability Ends"
-              type="datetime-local"
+              type="date"
               value={formData.expireAt}
               onChange={(e) => setFormData((prev) => ({ ...prev, expireAt: e.target.value }))}
               error={errors.expireAt}
@@ -202,8 +137,8 @@ export function NewCalendar() {
                 id="startTime"
                 min={0}
                 max={23}
-                value={formData.startTime}
-                onChange={(e) => setFormData((prev) => ({ ...prev, startTime: Number(e.target.value) }))}
+                value={formData.startTime/60}
+                onChange={(e) => setFormData((prev) => ({ ...prev, startTime: Number(e.target.value) * 60 }))}
                 className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
                 data-testid="start-time-input"
               />
@@ -223,8 +158,8 @@ export function NewCalendar() {
                 id="stopTime"
                 min={0}
                 max={23}
-                value={formData.stopTime}
-                onChange={(e) => setFormData((prev) => ({ ...prev, stopTime: Number(e.target.value) }))}
+                value={formData.stopTime/60}
+                onChange={(e) => setFormData((prev) => ({ ...prev, stopTime: Number(e.target.value) * 60 }))}
                 className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
                 data-testid="stop-time-input"
               />

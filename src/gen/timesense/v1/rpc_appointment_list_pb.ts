@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
+import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Appointment } from "./appointment_pb.js";
 
 /**
@@ -12,29 +12,34 @@ import { Appointment } from "./appointment_pb.js";
  */
 export class ListAppointmentsRequest extends Message<ListAppointmentsRequest> {
   /**
-   * @generated from field: int64 calendar_id = 1;
-   */
-  calendarId = protoInt64.zero;
-
-  /**
-   * @generated from field: int32 limit = 2;
+   * @generated from field: int32 limit = 1;
    */
   limit = 0;
 
   /**
-   * @generated from field: int32 offset = 3;
+   * @generated from field: int32 offset = 2;
    */
   offset = 0;
 
   /**
-   * @generated from field: google.protobuf.Timestamp live_at = 4;
+   * @generated from field: optional google.protobuf.Timestamp live_at = 3;
    */
   liveAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp expire_at = 5;
+   * @generated from field: optional google.protobuf.Timestamp expire_at = 4;
    */
   expireAt?: Timestamp;
+
+  /**
+   * @generated from field: optional int64 calendar_id = 5;
+   */
+  calendarId?: bigint;
+
+  /**
+   * @generated from field: optional int64 booker_id = 6;
+   */
+  bookerId?: bigint;
 
   constructor(data?: PartialMessage<ListAppointmentsRequest>) {
     super();
@@ -44,11 +49,12 @@ export class ListAppointmentsRequest extends Message<ListAppointmentsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "timesense.v1.ListAppointmentsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "calendar_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "offset", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "live_at", kind: "message", T: Timestamp },
-    { no: 5, name: "expire_at", kind: "message", T: Timestamp },
+    { no: 1, name: "limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "offset", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "live_at", kind: "message", T: Timestamp, opt: true },
+    { no: 4, name: "expire_at", kind: "message", T: Timestamp, opt: true },
+    { no: 5, name: "calendar_id", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+    { no: 6, name: "booker_id", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAppointmentsRequest {

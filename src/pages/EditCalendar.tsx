@@ -8,42 +8,10 @@ import { Footer } from "../components/Footer"
 import { Input } from "../components/Input"
 import { Button } from "../components/Button"
 import { CheckboxGroup } from "../components/Checkbox"
+import { SLOT_DURATIONS, WEEKDAYS } from "../models/calendar"
+import { Loading } from "../components/Loading"
+import { ValidateCalendar, type CalendarFormData, type CalendarFormErrors } from "../validator/calendarValidator"
 
-const WEEKDAYS = [
-  { value: 1, label: "Mon" },
-  { value: 2, label: "Tue" },
-  { value: 3, label: "Wed" },
-  { value: 4, label: "Thu" },
-  { value: 5, label: "Fri" },
-  { value: 6, label: "Sat" },
-  { value: 7, label: "Sun" },
-]
-
-const SLOT_DURATIONS = [
-  { value: 15, label: "15 minutes" },
-  { value: 30, label: "30 minutes" },
-  { value: 45, label: "45 minutes" },
-  { value: 60, label: "1 hour" },
-]
-
-interface FormData {
-  title: string
-  slotDuration: number
-  liveAt: string
-  expireAt: string
-  startTime: number
-  stopTime: number
-  weekDays: number[]
-}
-
-interface FormErrors {
-  title?: string
-  liveAt?: string
-  expireAt?: string
-  startTime?: string
-  stopTime?: string
-  weekDays?: string
-}
 
 export function EditCalendar() {
   const { id } = useParams<{ id: string }>()
@@ -51,7 +19,7 @@ export function EditCalendar() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CalendarFormData>({
     title: "",
     slotDuration: 30,
     liveAt: "",
@@ -60,7 +28,7 @@ export function EditCalendar() {
     stopTime: 17,
     weekDays: [1, 2, 3, 4, 5],
   })
-  const [errors, setErrors] = useState<FormErrors>({})
+  const [errors, setErrors] = useState<CalendarFormErrors>({})
 
   useEffect(() => {
     const fetchCalendar = async () => {
@@ -99,41 +67,10 @@ export function EditCalendar() {
     fetchCalendar()
   }, [id, navigate])
 
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required"
-    }
-
-    if (!formData.liveAt) {
-      newErrors.liveAt = "Start date is required"
-    }
-
-    if (!formData.expireAt) {
-      newErrors.expireAt = "End date is required"
-    }
-
-    if (formData.liveAt && formData.expireAt && formData.liveAt >= formData.expireAt) {
-      newErrors.expireAt = "End date must be after start date"
-    }
-
-    if (formData.startTime >= formData.stopTime) {
-      newErrors.stopTime = "End hour must be after start hour"
-    }
-
-    if (formData.weekDays.length === 0) {
-      newErrors.weekDays = "Select at least one day"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validate() || !id) return
+    if (!ValidateCalendar(formData, setErrors) || !id) return
 
     setIsSaving(true)
 
@@ -163,163 +100,151 @@ export function EditCalendar() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#F7F9FC] flex flex-col">
-        <Navbar isAuthenticated={isAuthenticated} />
-        <main className="flex-1 flex items-center justify-center mt-16">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-[#0052FF] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-[#6B7280]">Loading...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-[#F7F9FC] flex flex-col">
       <Navbar isAuthenticated={isAuthenticated} />
-      <main className="flex-1 max-w-2xl mx-auto px-4 py-12 mt-16 w-full">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">Edit Calendar</h1>
-          <p className="text-[#6B7280] mt-1">
-            Update your calendar settings.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-xl shadow-sm border border-[#E5EAF2] p-6" noValidate>
-          {/* Title */}
-          <Input
-            id="title"
-            label="Calendar Title"
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-            error={errors.title}
-            placeholder="e.g., Work Hours"
-            data-testid="calendar-title-input"
-          />
-
-          {/* Slot Duration */}
-          <div>
-            <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-              Slot Duration
-            </label>
-            <select
-              id="slotDuration"
-              value={formData.slotDuration}
-              onChange={(e) => setFormData((prev) => ({ ...prev, slotDuration: Number(e.target.value) }))}
-              className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
-              data-testid="slot-duration-select"
-            >
-              {SLOT_DURATIONS.map((duration) => (
-                <option key={duration.value} value={duration.value}>
-                  {duration.label}
-                </option>
-              ))}
-            </select>
+      {
+        isLoading ? <Loading/> : 
+        <main className="flex-1 max-w-2xl mx-auto px-4 py-12 mt-16 w-full">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-[#1A1A1A]">Edit Calendar</h1>
+            <p className="text-[#6B7280] mt-1">
+              Update your calendar settings.
+            </p>
           </div>
 
-          {/* Availability Window */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-xl shadow-sm border border-[#E5EAF2] p-6" noValidate>
+            {/* Title */}
             <Input
-              id="liveAt"
-              label="Availability Starts"
-              type="datetime-local"
-              value={formData.liveAt}
-              onChange={(e) => setFormData((prev) => ({ ...prev, liveAt: e.target.value }))}
-              error={errors.liveAt}
-              data-testid="live-at-input"
+              id="title"
+              label="Calendar Title"
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+              error={errors.title}
+              placeholder="e.g., Work Hours"
+              data-testid="calendar-title-input"
             />
-            <Input
-              id="expireAt"
-              label="Availability Ends"
-              type="datetime-local"
-              value={formData.expireAt}
-              onChange={(e) => setFormData((prev) => ({ ...prev, expireAt: e.target.value }))}
-              error={errors.expireAt}
-              data-testid="expire-at-input"
-            />
-          </div>
 
-          {/* Daily Hours */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Slot Duration */}
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                Daily Start Hour
+                Slot Duration
               </label>
-              <input
-                type="number"
-                id="startTime"
-                min={0}
-                max={23}
-                value={formData.startTime}
-                onChange={(e) => setFormData((prev) => ({ ...prev, startTime: Number(e.target.value) }))}
+              <select
+                id="slotDuration"
+                value={formData.slotDuration}
+                onChange={(e) => setFormData((prev) => ({ ...prev, slotDuration: Number(e.target.value) }))}
                 className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
-                data-testid="start-time-input"
-              />
-              {errors.startTime && (
-                <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="startTime-error">
-                  {errors.startTime}
-                </p>
-              )}
-              <p className="mt-1 text-xs text-[#6B7280]">Hour (0-23, e.g., 9 for 9 AM)</p>
+                data-testid="slot-duration-select"
+              >
+                {SLOT_DURATIONS.map((duration) => (
+                  <option key={duration.value} value={duration.value}>
+                    {duration.label}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                Daily End Hour
-              </label>
-              <input
-                type="number"
-                id="stopTime"
-                min={0}
-                max={23}
-                value={formData.stopTime}
-                onChange={(e) => setFormData((prev) => ({ ...prev, stopTime: Number(e.target.value) }))}
-                className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
-                data-testid="stop-time-input"
+
+            {/* Availability Window */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                id="liveAt"
+                label="Availability Starts"
+                type="date"
+                value={formData.liveAt}
+                onChange={(e) => setFormData((prev) => ({ ...prev, liveAt: e.target.value }))}
+                error={errors.liveAt}
+                data-testid="live-at-input"
               />
-              {errors.stopTime && (
-                <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="stopTime-error">
-                  {errors.stopTime}
-                </p>
-              )}
-              <p className="mt-1 text-xs text-[#6B7280]">Hour (0-23, e.g., 17 for 5 PM)</p>
+              <Input
+                id="expireAt"
+                label="Availability Ends"
+                type="date"
+                value={formData.expireAt}
+                onChange={(e) => setFormData((prev) => ({ ...prev, expireAt: e.target.value }))}
+                error={errors.expireAt}
+                data-testid="expire-at-input"
+              />
             </div>
-          </div>
 
-          {/* Working Days */}
-          <CheckboxGroup
-            label="Working Days"
-            options={WEEKDAYS}
-            selected={formData.weekDays}
-            onChange={(selected) => setFormData((prev) => ({ ...prev, weekDays: selected }))}
-            error={errors.weekDays}
-            data-testid="weekdays-checkbox-group"
-          />
+            {/* Daily Hours */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                  Daily Start Hour
+                </label>
+                <input
+                  type="number"
+                  id="startTime"
+                  min={0}
+                  max={23}
+                  value={formData.startTime/60}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, startTime: Number(e.target.value) * 60 }))}
+                  className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
+                  data-testid="start-time-input"
+                />
+                {errors.startTime && (
+                  <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="startTime-error">
+                    {errors.startTime}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-[#6B7280]">Hour (0-23, e.g., 9 for 9 AM)</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                  Daily End Hour
+                </label>
+                <input
+                  type="number"
+                  id="stopTime"
+                  min={0}
+                  max={23}
+                  value={formData.stopTime/60}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, stopTime: Number(e.target.value) * 60 }))}
+                  className="w-full px-4 py-2.5 rounded-lg border border-[#E5EAF2] focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-white"
+                  data-testid="stop-time-input"
+                />
+                {errors.stopTime && (
+                  <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="stopTime-error">
+                    {errors.stopTime}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-[#6B7280]">Hour (0-23, e.g., 17 for 5 PM)</p>
+              </div>
+            </div>
 
-          {/* Submit */}
-          <div className="flex gap-4 pt-4 justify-center">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate(`/calendars/${id}`)}
-              data-testid="cancel-button"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              isLoading={isSaving}
-              data-testid="update-calendar-button"
-            >
-              Save Changes
-            </Button>
-          </div>
-        </form>
-      </main>
+            {/* Working Days */}
+            <CheckboxGroup
+              label="Working Days"
+              options={WEEKDAYS}
+              selected={formData.weekDays}
+              onChange={(selected) => setFormData((prev) => ({ ...prev, weekDays: selected }))}
+              error={errors.weekDays}
+              data-testid="weekdays-checkbox-group"
+            />
+
+            {/* Submit */}
+            <div className="flex gap-4 pt-4 justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(`/calendars/${id}`)}
+                data-testid="cancel-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                isLoading={isSaving}
+                data-testid="update-calendar-button"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </main>
+      }
       <Footer />
     </div>
   )

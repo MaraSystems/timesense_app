@@ -1,22 +1,28 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type SetStateAction } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
-import { HiCalendar, HiClock, HiArrowLeft, HiPencil, HiTrash } from "react-icons/hi"
+import { HiCalendar, HiClock, HiArrowLeft, HiPencil, HiTrash, HiShare, HiPlus, HiOutlineCalendar } from "react-icons/hi"
 import { toast } from "react-toastify"
+import { format, parseISO } from "date-fns"
 import { useAuth } from "../auth"
-import { getCalendar, deleteCalendar, type CalendarDisplay } from "../services/calendar.service"
+import { getCalendar, deleteCalendar } from "../services/calendar.service"
 import { Navbar } from "../components/Navbar"
 import { Footer } from "../components/Footer"
 import { Button } from "../components/Button"
+import { formatTime, getDayLabel } from "../utils/calendar"
+import type { CalendarDisplay } from "../models/calendar"
+import { handleShare } from "../utils/share"
+import { Delete } from "../components/Delete"
 
 export function CalendarView() {
   const { id } = useParams<{ id: string }>()
-  const { isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [calendar, setCalendar] = useState<CalendarDisplay | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const isOwner = calendar && user && calendar.ownerId === user.id
 
   useEffect(() => {
     const fetchCalendar = async () => {
@@ -44,7 +50,7 @@ export function CalendarView() {
     fetchCalendar()
   }, [id])
 
-  const handleDelete = async () => {
+  const handleDelete = async (setIsDeleting: (flag: SetStateAction<boolean>) => void) => {
     if (!id) return
 
     setIsDeleting(true)
@@ -62,28 +68,6 @@ export function CalendarView() {
       setIsDeleting(false)
       setShowDeleteConfirm(false)
     }
-  }
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A"
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
-  const formatTime = (hour: number) => {
-    if (hour === 0 || hour === 24) return "12:00 AM"
-    if (hour === 12) return "12:00 PM"
-    const h = hour > 12 ? hour - 12 : hour
-    const period = hour >= 12 ? "PM" : "AM"
-    return `${h}:00 ${period}`
-  }
-
-  const getDayLabel = (day: number) => {
-    const days = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    return days[day] || ""
   }
 
   return (
@@ -112,73 +96,125 @@ export function CalendarView() {
         ) : calendar ? (
           <div className="bg-white rounded-xl shadow-sm border border-[#E5EAF2] overflow-hidden">
             {/* Header */}
-            <div className="bg-[#0052FF] px-6 py-8">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                      <HiCalendar className="w-6 h-6 text-white" />
+            <div className="bg-gradient-to-r from-[#0052FF] to-[#0066FF] px-8 py-10">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                      <HiCalendar className="w-7 h-7 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-white">{calendar.title}</h1>
                   </div>
-                  <p className="text-white/80 ml-13">
-                    {formatDate(calendar.liveAt)} - {formatDate(calendar.expireAt)}
-                  </p>
                 </div>
-                <div className="flex gap-2">
-                  <Link to={`/calendars/${id}/edit`}>
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-3">
+                  {/* Book button - available for everyone */}
+                  <Link to={`/appointments/new?calendarId=${id}`}>
                     <Button
                       variant="outline"
-                      className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-                      data-testid="edit-button"
+                      className="!bg-white !text-[#0052FF] border-white hover:!bg-white/90"
+                      data-testid="book-appointment-button"
                     >
-                      <HiPencil className="w-5 h-5 mr-2" />
-                      Edit
+                      <HiPlus className="w-5 h-5 mr-2" />
+                      Book Appointment
                     </Button>
                   </Link>
-                  <Button
-                    variant="outline"
-                    className="bg-white/20 border-white/30 text-white hover:bg-red-500/80"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    data-testid="delete-button"
-                  >
-                    <HiTrash className="w-5 h-5 mr-2" />
-                    Delete
-                  </Button>
+
+                  {/* Owner-only actions */}
+                  {isOwner && (
+                    <>
+                      <Link to={`/calendars/${id}/appointments`}>
+                        <Button
+                          variant="outline"
+                          className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                          data-testid="view-appointments-button"
+                        >
+                          <HiOutlineCalendar className="w-5 h-5 mr-2" />
+                          View Appointments
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                        onClick={() => {
+                          const url = id ? `appointments/new?calendarId=${id}` : ''
+                          handleShare(url)
+                        }}
+                        data-testid="share-button"
+                      >
+                        <HiShare className="w-5 h-5 mr-2" />
+                        Share
+                      </Button>
+                      <Link to={`/calendars/${id}/edit`}>
+                        <Button
+                          variant="outline"
+                          className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                          data-testid="edit-button"
+                        >
+                          <HiPencil className="w-5 h-5 mr-2" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="bg-white/20 border-white/30 text-white hover:bg-red-500/80"
+                        onClick={() => setShowDeleteConfirm(true)}
+                        data-testid="delete-button"
+                      >
+                        <HiTrash className="w-5 h-5 mr-2" />
+                        Delete
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Details */}
-            <div className="p-6 space-y-6">
-              {/* Time Settings */}
-              <div>
-                <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
-                  Availability
+            <div className="p-8 space-y-8">
+              {/* Schedule Info */}
+              <div className="bg-[#F7F9FC] rounded-xl p-6">
+                <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-4">
+                  Schedule
                 </h2>
-                <div className="bg-[#F7F9FC] rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex items-center gap-3">
-                    <HiClock className="w-5 h-5 text-[#0052FF]" />
-                    <span className="text-[#1A1A1A]">
-                      {formatTime(calendar.startTime)} - {formatTime(calendar.stopTime)}
-                    </span>
+                    <div className="w-10 h-10 rounded-lg bg-[#0052FF]/10 flex items-center justify-center">
+                      <HiCalendar className="w-5 h-5 text-[#0052FF]" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#6B7280]">Active Period</p>
+                      <p className="text-[#1A1A1A] font-medium">
+                        {format(parseISO(calendar.liveAt), "MMM d, yyyy")} — {format(parseISO(calendar.expireAt), "MMM d, yyyy")}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-[#6B7280] mt-1 ml-8">
-                    {calendar.slotDuration} minute appointment slots
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#0052FF]/10 flex items-center justify-center">
+                      <HiClock className="w-5 h-5 text-[#0052FF]" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#6B7280]">Daily Hours</p>
+                      <p className="text-[#1A1A1A] font-medium">
+                        {formatTime(calendar.startTime)} — {formatTime(calendar.stopTime)}
+                        <span className="text-[#6B7280] font-normal ml-2">({calendar.slotDuration} min slots)</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Working Days */}
               <div>
-                <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
+                <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-4">
                   Working Days
                 </h2>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {calendar.weekDays.values.sort((a, b) => a - b).map((day) => (
                     <span
                       key={day}
-                      className="bg-[#0052FF]/10 text-[#0052FF] px-3 py-1.5 rounded-lg text-sm font-medium"
+                      className="bg-[#0052FF]/10 text-[#0052FF] px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       {getDayLabel(day)}
                     </span>
@@ -187,15 +223,19 @@ export function CalendarView() {
               </div>
 
               {/* Additional Info */}
-              <div className="pt-4 border-t border-[#E5EAF2]">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="pt-6 border-t border-[#E5EAF2]">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <span className="text-[#6B7280]">Created</span>
-                    <p className="text-[#1A1A1A] font-medium">{formatDate(calendar.createdAt)}</p>
+                    <span className="text-sm text-[#6B7280]">Created</span>
+                    <p className="text-[#1A1A1A] font-medium mt-1">
+                      {format(parseISO(calendar.createdAt), "MMM d, yyyy")}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-[#6B7280]">Last Updated</span>
-                    <p className="text-[#1A1A1A] font-medium">{formatDate(calendar.updatedAt)}</p>
+                    <span className="text-sm text-[#6B7280]">Last Updated</span>
+                    <p className="text-[#1A1A1A] font-medium mt-1">
+                      {format(parseISO(calendar.updatedAt), "MMM d, yyyy")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -210,33 +250,7 @@ export function CalendarView() {
       <Footer />
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Delete Calendar</h2>
-            <p className="text-[#6B7280] mb-6">
-              Are you sure you want to delete "{calendar?.title}"? This action cannot be undone.
-            </p>
-            <div className="flex gap-4 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-[#FF4D4F] hover:bg-[#FF4D4F]/80"
-                onClick={handleDelete}
-                isLoading={isDeleting}
-                data-testid="confirm-delete-button"
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showDeleteConfirm && <Delete title={calendar?.title} handleDelete={handleDelete} setShowDeleteConfirm={setShowDeleteConfirm}/>}
     </div>
   )
 }

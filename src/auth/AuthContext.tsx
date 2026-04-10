@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { login as loginService, createUser, type UserDisplay } from '../services/user.service'
+import { login as loginService, createUser } from '../services/user.service'
+import type { UserDisplay } from '../models/user'
 
 interface AuthContextType {
   user: UserDisplay | null
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      const response = await loginService(email, password)
+      const response = await loginService({email, password})
       if (response.success && response.data) {
         localStorage.setItem(AUTH_TOKEN_KEY, response.data.accessToken)
         localStorage.setItem(USER_KEY, JSON.stringify(response.data.user))
