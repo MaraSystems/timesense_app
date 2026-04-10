@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { HiClock, HiCalendar, HiPencil, HiTrash, HiExclamation } from "react-icons/hi"
+import { useNavigate } from "react-router-dom"
+import { HiClock, HiCalendar, HiPencil, HiTrash, HiExclamation, HiChevronRight } from "react-icons/hi"
 import { Button } from "./Button"
 import { formatDate, formatTime, getDayLabel } from "../utils/calendar"
 import { RECURRENCE_OPTIONS } from "../models/appointment"
@@ -13,17 +13,24 @@ interface AppointmentCardProps {
 }
 
 export function AppointmentCard({ appointment, currentUserId, onDelete }: AppointmentCardProps) {
-  console.log(appointment)
+  const navigate = useNavigate()
   const isBooker = currentUserId === appointment.bookerId
   const getRecurrenceLabel = (recurrence: Recurrence) => {
     const option = RECURRENCE_OPTIONS.find((opt) => opt.value === recurrence)
     return option?.label || "One-time"
   }
 
+  const handleCardClick = () => {
+    navigate(`/appointments/${appointment.id}`)
+  }
+
   return (
-    <div className={`bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition-shadow flex flex-col h-full ${
-      appointment.rebook ? "border-[#FF4D4F]/50" : "border-[#E5EAF2]"
-    }`}>
+    <div
+      onClick={handleCardClick}
+      className={`bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition-shadow flex flex-col h-full cursor-pointer ${
+        appointment.rebook ? "border-[#FF4D4F]/50" : "border-[#E5EAF2]"
+      }`}
+    >
       {appointment.rebook && (
         <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-[#FF4D4F]/10 rounded-lg">
           <HiExclamation className="w-5 h-5 text-[#FF4D4F] shrink-0" />
@@ -35,15 +42,18 @@ export function AppointmentCard({ appointment, currentUserId, onDelete }: Appoin
 
       <div className="flex items-start justify-between gap-2 mb-3">
         <h3 className="font-semibold text-[#1A1A1A] text-lg line-clamp-2">{appointment.title}</h3>
-        <span className={`shrink-0 px-2 py-1 rounded text-xs font-medium ${
-          appointment.recurrence === Recurrence.UNSPECIFIED
-            ? "bg-[#10B981]/10 text-[#10B981]"
-            : appointment.recurrence === Recurrence.WEEKLY
-              ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-              : "bg-[#8B5CF6]/10 text-[#8B5CF6]"
-        }`}>
-          {getRecurrenceLabel(appointment.recurrence)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`shrink-0 px-2 py-1 rounded text-xs font-medium ${
+            appointment.recurrence === Recurrence.UNSPECIFIED
+              ? "bg-[#10B981]/10 text-[#10B981]"
+              : appointment.recurrence === Recurrence.WEEKLY
+                ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+                : "bg-[#8B5CF6]/10 text-[#8B5CF6]"
+          }`}>
+            {getRecurrenceLabel(appointment.recurrence)}
+          </span>
+          <HiChevronRight className="w-5 h-5 text-[#6B7280] shrink-0" />
+        </div>
       </div>
 
       <div className="space-y-2 mb-3">
@@ -80,13 +90,16 @@ export function AppointmentCard({ appointment, currentUserId, onDelete }: Appoin
       )}
 
       {isBooker && (
-        <div className="flex gap-2 mt-auto pt-3 border-t border-[#E5EAF2]">
-          <Link to={`/appointments/${appointment.id}/edit`} className="flex-1">
-            <Button variant="outline" size="sm" className="w-full">
-              <HiPencil className="w-4 h-4 mr-1" />
-              Edit
-            </Button>
-          </Link>
+        <div className="flex gap-2 mt-auto pt-3 border-t border-[#E5EAF2]" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => navigate(`/appointments/${appointment.id}/edit`)}
+          >
+            <HiPencil className="w-4 h-4 mr-1" />
+            Edit
+          </Button>
           <Button
             variant="outline"
             size="sm"

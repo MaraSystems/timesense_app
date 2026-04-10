@@ -101,3 +101,20 @@ export interface ListAppointmentsParams {
   liveAt?: string
   expireAt?: string
 }
+
+export interface SlotDisplay {
+  startTime: number
+  stopTime: number
+  date: string
+  booked: boolean
+}
+
+export function toSlotDisplay(slot: import("../gen/timesense/v1/slot_pb").Slot): SlotDisplay {
+  const slotDate = slot.date?.toDate()
+  return {
+    startTime: slot.startTime,
+    stopTime: slot.stopTime,
+    date: slotDate ? format(slotDate, "yyyy-MM-dd") : '',
+    booked: slot.booked,
+  }
+}

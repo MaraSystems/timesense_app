@@ -16,6 +16,8 @@ export interface AppointmentFormErrors {
   date?: string
   timeSlot?: string
   days?: string
+  weekDays?: string
+  months?: string
 }
 
 export const ValidateAppointment = (formData: AppointmentFormData, setErrors: Dispatch<SetStateAction<AppointmentFormErrors>>): boolean => {

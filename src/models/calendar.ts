@@ -1,4 +1,5 @@
-import type { Calendar, CalendarSlot } from "../gen/timesense/v1/calendar_pb"
+import type { Calendar } from "../gen/timesense/v1/calendar_pb"
+import type { Slot } from "../gen/timesense/v1/slot_pb"
 import { format } from "date-fns"
 
 export interface CalendarDisplay {
@@ -82,7 +83,7 @@ export function toCalendarDisplay(calendar: Calendar): CalendarDisplay {
   }
 }
 
-export function toCalendarSlotDisplay(slot: CalendarSlot): CalendarSlotDisplay {
+export function toCalendarSlotDisplay(slot: Slot): CalendarSlotDisplay {
   const slotDate = slot.date?.toDate()
   return {
     startTime: slot.startTime,

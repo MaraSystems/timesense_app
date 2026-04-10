@@ -1,7 +1,7 @@
 import { client } from './api'
 import { Timestamp } from '@bufbuild/protobuf'
 import { Recurrence } from '../gen/timesense/v1/appointment_pb'
-import { toAppointmentDisplay, type CreateAppointmentParams, type UpdateAppointmentParams, type ListAppointmentsParams } from '../models/appointment'
+import { toAppointmentDisplay, toSlotDisplay, type CreateAppointmentParams, type UpdateAppointmentParams, type ListAppointmentsParams } from '../models/appointment'
 
 export const createAppointment = async (data: CreateAppointmentParams) => {
   const response = await client.createAppointment({
@@ -80,6 +80,23 @@ export const deleteAppointment = async (id: string) => {
   return {
     success: response.success,
     message: response.message,
+  }
+}
+
+export const getAppointmentSlots = async (id: string, params?: { liveAt?: string; expireAt?: string }) => {
+  const response = await client.getAppointmentSlots({
+    id: BigInt(id),
+    liveAt: params?.liveAt ? Timestamp.fromDate(new Date(params.liveAt)) : undefined,
+    expireAt: params?.expireAt ? Timestamp.fromDate(new Date(params.expireAt)) : undefined,
+  })
+
+  return {
+    success: response.success,
+    message: response.message,
+    data: response.data?.data ? {
+      data: response.data.data.map(toSlotDisplay),
+      next: response.data.next || false,
+    } : undefined,
   }
 }
 

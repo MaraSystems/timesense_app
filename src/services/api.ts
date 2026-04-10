@@ -19,7 +19,6 @@ const logoutInterceptor: Interceptor = (next) => async (req) => {
   try {
     return await next(req);
   } catch (error) {
-    console.log(error)
     if (error instanceof Error && error.message.includes('unauthenticated')) {
       localStorage.removeItem(AUTH_TOKEN_KEY);
       localStorage.removeItem(USER_KEY);

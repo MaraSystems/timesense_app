@@ -483,13 +483,25 @@ export function EditAppointment() {
           )}
 
           {/* Months Selection */}
-          {(formData.recurrence === Recurrence.WEEKLY || formData.recurrence === Recurrence.MONTHLY) && (
+          {(formData.recurrence === Recurrence.WEEKLY || formData.recurrence === Recurrence.MONTHLY) && calendar && (
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
                 Select Months
               </label>
               <div className="flex flex-wrap gap-3">
-                {MONTHS.map((month) => (
+                {MONTHS.filter((month) => {
+                  const startMonth = new Date(calendar.liveAt).getMonth() + 1
+                  const endMonth = new Date(calendar.expireAt).getMonth() + 1
+                  const startYear = new Date(calendar.liveAt).getFullYear()
+                  const endYear = new Date(calendar.expireAt).getFullYear()
+
+                  // If same year, filter months between start and end
+                  if (startYear === endYear) {
+                    return month.value >= startMonth && month.value <= endMonth
+                  }
+                  // If spans multiple years, all months are available
+                  return true
+                }).map((month) => (
                   <button
                     key={month.value}
                     type="button"
@@ -510,6 +522,11 @@ export function EditAppointment() {
                   </button>
                 ))}
               </div>
+              {errors.months && (
+                <p className="mt-1 text-sm text-[#FF4D4F]" data-testid="months-error">
+                  {errors.months}
+                </p>
+              )}
             </div>
           )}
 

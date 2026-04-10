@@ -15,7 +15,7 @@ import { ListCalendarsInRangeRequest, ListCalendarsInRangeResponse, ListCalendar
 import { DeleteCalendarRequest, DeleteCalendarResponse } from "./rpc_calendar_delete_pb.js";
 import { CreateAppointmentRequest, CreateAppointmentResponse } from "./rpc_appointment_create_pb.js";
 import { UpdateAppointmentRequest, UpdateAppointmentResponse } from "./rpc_appointment_update_pb.js";
-import { GetAppointmentRequest, GetAppointmentResponse } from "./rpc_appointment_get_pb.js";
+import { GetAppointmentRequest, GetAppointmentResponse, GetAppointmentSlotsRequest, GetAppointmentSlotsResponse } from "./rpc_appointment_get_pb.js";
 import { ListAppointmentsRequest, ListAppointmentsResponse } from "./rpc_appointment_list_pb.js";
 import { DeleteAppointmentRequest, DeleteAppointmentResponse } from "./rpc_appointment_delete_pb.js";
 
@@ -179,6 +179,17 @@ export const TimeSenseService = {
       name: "GetAppointment",
       I: GetAppointmentRequest,
       O: GetAppointmentResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get appointment slots
+     *
+     * @generated from rpc timesense.v1.TimeSenseService.GetAppointmentSlots
+     */
+    getAppointmentSlots: {
+      name: "GetAppointmentSlots",
+      I: GetAppointmentSlotsRequest,
+      O: GetAppointmentSlotsResponse,
       kind: MethodKind.Unary,
     },
     /**

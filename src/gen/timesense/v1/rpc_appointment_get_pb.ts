@@ -4,8 +4,9 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 import { Appointment } from "./appointment_pb.js";
+import { SlotPage } from "./slot_pb.js";
 
 /**
  * @generated from message timesense.v1.GetAppointmentRequest
@@ -90,6 +91,104 @@ export class GetAppointmentResponse extends Message<GetAppointmentResponse> {
 
   static equals(a: GetAppointmentResponse | PlainMessage<GetAppointmentResponse> | undefined, b: GetAppointmentResponse | PlainMessage<GetAppointmentResponse> | undefined): boolean {
     return proto3.util.equals(GetAppointmentResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message timesense.v1.GetAppointmentSlotsRequest
+ */
+export class GetAppointmentSlotsRequest extends Message<GetAppointmentSlotsRequest> {
+  /**
+   * @generated from field: int64 id = 1;
+   */
+  id = protoInt64.zero;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp live_at = 2;
+   */
+  liveAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expire_at = 3;
+   */
+  expireAt?: Timestamp;
+
+  constructor(data?: PartialMessage<GetAppointmentSlotsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "timesense.v1.GetAppointmentSlotsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "live_at", kind: "message", T: Timestamp },
+    { no: 3, name: "expire_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppointmentSlotsRequest {
+    return new GetAppointmentSlotsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppointmentSlotsRequest {
+    return new GetAppointmentSlotsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppointmentSlotsRequest {
+    return new GetAppointmentSlotsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppointmentSlotsRequest | PlainMessage<GetAppointmentSlotsRequest> | undefined, b: GetAppointmentSlotsRequest | PlainMessage<GetAppointmentSlotsRequest> | undefined): boolean {
+    return proto3.util.equals(GetAppointmentSlotsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message timesense.v1.GetAppointmentSlotsResponse
+ */
+export class GetAppointmentSlotsResponse extends Message<GetAppointmentSlotsResponse> {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success = false;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message = "";
+
+  /**
+   * @generated from field: timesense.v1.SlotPage data = 3;
+   */
+  data?: SlotPage;
+
+  constructor(data?: PartialMessage<GetAppointmentSlotsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "timesense.v1.GetAppointmentSlotsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "data", kind: "message", T: SlotPage },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppointmentSlotsResponse {
+    return new GetAppointmentSlotsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppointmentSlotsResponse {
+    return new GetAppointmentSlotsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppointmentSlotsResponse {
+    return new GetAppointmentSlotsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppointmentSlotsResponse | PlainMessage<GetAppointmentSlotsResponse> | undefined, b: GetAppointmentSlotsResponse | PlainMessage<GetAppointmentSlotsResponse> | undefined): boolean {
+    return proto3.util.equals(GetAppointmentSlotsResponse, a, b);
   }
 }
 

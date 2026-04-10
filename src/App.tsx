@@ -13,6 +13,7 @@ import { EditCalendar } from "./pages/EditCalendar"
 import { NewCalendar } from "./pages/NewCalendar"
 import { NewAppointment } from "./pages/NewAppointment"
 import { Appointments } from "./pages/Appointments"
+import { ViewAppointment } from "./pages/ViewAppointment"
 import { EditAppointment } from "./pages/EditAppointment"
 import { CalendarAppointments } from "./pages/CalendarAppointments"
 
@@ -78,6 +79,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Appointments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appointments/:id"
+              element={
+                <ProtectedRoute>
+                  <ViewAppointment />
                 </ProtectedRoute>
               }
             />

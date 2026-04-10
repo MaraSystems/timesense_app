@@ -1,15 +1,15 @@
 import { useEffect, useState, type SetStateAction } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
-import { HiCalendar, HiClock, HiArrowLeft, HiPencil, HiTrash, HiShare, HiPlus, HiOutlineCalendar } from "react-icons/hi"
+import { HiCalendar, HiClock, HiArrowLeft, HiPencil, HiTrash, HiShare, HiPlus, HiOutlineCalendar, HiChevronLeft, HiChevronRight } from "react-icons/hi"
 import { toast } from "react-toastify"
-import { format, parseISO } from "date-fns"
+import { format, parseISO, startOfMonth, endOfMonth, addMonths, subMonths, isToday } from "date-fns"
 import { useAuth } from "../auth"
-import { getCalendar, deleteCalendar } from "../services/calendar.service"
+import { getCalendar, deleteCalendar, getCalendarSlots } from "../services/calendar.service"
 import { Navbar } from "../components/Navbar"
 import { Footer } from "../components/Footer"
 import { Button } from "../components/Button"
 import { formatTime, getDayLabel } from "../utils/calendar"
-import type { CalendarDisplay } from "../models/calendar"
+import type { CalendarDisplay, CalendarSlotDisplay } from "../models/calendar"
 import { handleShare } from "../utils/share"
 import { Delete } from "../components/Delete"
 
@@ -18,9 +18,13 @@ export function CalendarView() {
   const { user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [calendar, setCalendar] = useState<CalendarDisplay | null>(null)
+  const [slots, setSlots] = useState<CalendarSlotDisplay[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentMonth, setCurrentMonth] = useState<Date | null>(null)
+  const [hasNextPage, setHasNextPage] = useState(false)
 
   const isOwner = calendar && user && calendar.ownerId === user.id
 
@@ -33,6 +37,10 @@ export function CalendarView() {
         const response = await getCalendar(id)
         if (response.success && response.data) {
           setCalendar(response.data)
+
+          // Set initial month to the calendar's liveAt month
+          const initialMonth = startOfMonth(parseISO(response.data.liveAt))
+          setCurrentMonth(initialMonth)
         } else {
           const message = response.message || "Failed to load calendar"
           setError(message)
@@ -49,6 +57,109 @@ export function CalendarView() {
 
     fetchCalendar()
   }, [id])
+
+  // Fetch slots when month changes
+  useEffect(() => {
+    const fetchSlots = async () => {
+      if (!id || !currentMonth || !calendar) return
+
+      try {
+        setIsLoadingSlots(true)
+        const monthStart = format(startOfMonth(currentMonth), "yyyy-MM-dd")
+        const monthEnd = format(endOfMonth(currentMonth), "yyyy-MM-dd")
+
+        const slotsResponse = await getCalendarSlots(id, {
+          liveAt: monthStart,
+          expireAt: monthEnd,
+        })
+
+        if (slotsResponse.success && slotsResponse.data) {
+          setSlots(slotsResponse.data.data)
+          setHasNextPage(slotsResponse.data.next)
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load slots"
+        toast.error(message)
+      } finally {
+        setIsLoadingSlots(false)
+      }
+    }
+
+    fetchSlots()
+  }, [id, currentMonth, calendar])
+
+  const goToPreviousMonth = () => {
+    if (!currentMonth || !calendar) return
+    const prevMonth = subMonths(currentMonth, 1)
+    // Don't go before the calendar's liveAt month
+    const liveAtMonth = startOfMonth(parseISO(calendar.liveAt))
+    if (prevMonth >= liveAtMonth) {
+      setCurrentMonth(prevMonth)
+    }
+  }
+
+  const goToNextMonth = () => {
+    if (!currentMonth || !calendar) return
+    const nextMonth = addMonths(currentMonth, 1)
+    // Don't go after the calendar's expireAt month
+    const expireAtMonth = startOfMonth(parseISO(calendar.expireAt))
+    if (nextMonth <= expireAtMonth || hasNextPage) {
+      setCurrentMonth(nextMonth)
+    }
+  }
+
+  const canGoToPreviousMonth = () => {
+    if (!currentMonth || !calendar) return false
+    const liveAtMonth = startOfMonth(parseISO(calendar.liveAt))
+    return currentMonth > liveAtMonth
+  }
+
+  const canGoToNextMonth = () => {
+    if (!currentMonth || !calendar) return false
+    const expireAtMonth = startOfMonth(parseISO(calendar.expireAt))
+    return currentMonth < expireAtMonth || hasNextPage
+  }
+
+  // Group slots by date
+  const slotsByDate = slots.reduce<Record<string, CalendarSlotDisplay[]>>((acc, slot) => {
+    if (!acc[slot.date]) {
+      acc[slot.date] = []
+    }
+    acc[slot.date].push(slot)
+    return acc
+  }, {})
+
+  // Sort dates
+  const sortedDates = Object.keys(slotsByDate).sort((a, b) =>
+    new Date(a).getTime() - new Date(b).getTime()
+  )
+
+  // Get slot style based on date and booking status
+  const getSlotStyle = (date: string, booked: boolean) => {
+    const slotDate = parseISO(date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const isPastDate = slotDate < today
+    const isTodayDate = isToday(slotDate)
+
+    if (isPastDate) {
+      return booked
+        ? "bg-[#9CA3AF]/20 text-[#9CA3AF] line-through"
+        : "bg-[#F3F4F6] text-[#9CA3AF] line-through"
+    }
+
+    if (isTodayDate) {
+      return booked
+        ? "bg-[#059669] text-white"
+        : "bg-[#0052FF]/10 text-[#0052FF] border border-[#0052FF]/30"
+    }
+
+    // Future dates
+    return booked
+      ? "bg-[#10B981]/10 text-[#10B981]"
+      : "bg-white text-[#6B7280]"
+  }
 
   const handleDelete = async (setIsDeleting: (flag: SetStateAction<boolean>) => void) => {
     if (!id) return
@@ -220,6 +331,93 @@ export function CalendarView() {
                     </span>
                   ))}
                 </div>
+              </div>
+
+              {/* Calendar Slots */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide">
+                    Available Slots
+                  </h2>
+                  {currentMonth && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={goToPreviousMonth}
+                        disabled={!canGoToPreviousMonth()}
+                        className="p-1.5 rounded-lg border border-[#E5EAF2] hover:bg-[#F7F9FC] disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Previous month"
+                      >
+                        <HiChevronLeft className="w-5 h-5 text-[#6B7280]" />
+                      </button>
+                      <span className="text-sm font-medium text-[#1A1A1A] min-w-[120px] text-center">
+                        {format(currentMonth, "MMMM yyyy")}
+                      </span>
+                      <button
+                        onClick={goToNextMonth}
+                        disabled={!canGoToNextMonth()}
+                        className="p-1.5 rounded-lg border border-[#E5EAF2] hover:bg-[#F7F9FC] disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Next month"
+                      >
+                        <HiChevronRight className="w-5 h-5 text-[#6B7280]" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {isLoadingSlots ? (
+                  <div className="text-center py-8 text-[#6B7280]">Loading slots...</div>
+                ) : slots.length === 0 ? (
+                  <div className="text-center py-8 text-[#6B7280]">No slots available for this month</div>
+                ) : (
+                  <div className="bg-[#F7F9FC] rounded-xl p-4 max-h-96 overflow-y-auto">
+                    <div className="space-y-4">
+                      {sortedDates.map((date) => {
+                        const slotDate = parseISO(date)
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const isPastDate = slotDate < today
+                        const isTodayDate = isToday(slotDate)
+
+                        return (
+                          <div key={date}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className={`text-sm font-medium ${
+                                isPastDate
+                                  ? "text-[#9CA3AF]"
+                                  : isTodayDate
+                                    ? "text-[#0052FF]"
+                                    : "text-[#1A1A1A]"
+                              }`}>
+                                {format(slotDate, "EEEE, MMMM d, yyyy")}
+                              </h3>
+                              {isTodayDate && (
+                                <span className="px-2 py-0.5 text-xs font-medium bg-[#0052FF]/10 text-[#0052FF] rounded">
+                                  Today
+                                </span>
+                              )}
+                              {isPastDate && (
+                                <span className="px-2 py-0.5 text-xs font-medium bg-[#9CA3AF]/10 text-[#9CA3AF] rounded">
+                                  Past
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {slotsByDate[date]
+                                .sort((a, b) => a.startTime - b.startTime)
+                                .map((slot, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium ${getSlotStyle(date, slot.booked)}`}
+                                  >
+                                    {formatTime(slot.startTime)} - {formatTime(slot.stopTime)}
+                                  </span>
+                                ))}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Additional Info */}

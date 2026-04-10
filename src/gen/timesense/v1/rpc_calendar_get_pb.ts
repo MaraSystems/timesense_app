@@ -5,7 +5,8 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
-import { Calendar, CalendarSlot } from "./calendar_pb.js";
+import { Calendar } from "./calendar_pb.js";
+import { SlotPage } from "./slot_pb.js";
 
 /**
  * @generated from message timesense.v1.GetCalendarRequest
@@ -143,49 +144,6 @@ export class GetCalendarSlotsRequest extends Message<GetCalendarSlotsRequest> {
 }
 
 /**
- * @generated from message timesense.v1.CalendarSlotPage
- */
-export class CalendarSlotPage extends Message<CalendarSlotPage> {
-  /**
-   * @generated from field: repeated timesense.v1.CalendarSlot data = 1;
-   */
-  data: CalendarSlot[] = [];
-
-  /**
-   * @generated from field: bool next = 2;
-   */
-  next = false;
-
-  constructor(data?: PartialMessage<CalendarSlotPage>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "timesense.v1.CalendarSlotPage";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "data", kind: "message", T: CalendarSlot, repeated: true },
-    { no: 2, name: "next", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CalendarSlotPage {
-    return new CalendarSlotPage().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CalendarSlotPage {
-    return new CalendarSlotPage().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CalendarSlotPage {
-    return new CalendarSlotPage().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CalendarSlotPage | PlainMessage<CalendarSlotPage> | undefined, b: CalendarSlotPage | PlainMessage<CalendarSlotPage> | undefined): boolean {
-    return proto3.util.equals(CalendarSlotPage, a, b);
-  }
-}
-
-/**
  * @generated from message timesense.v1.GetCalendarSlotsResponse
  */
 export class GetCalendarSlotsResponse extends Message<GetCalendarSlotsResponse> {
@@ -200,9 +158,9 @@ export class GetCalendarSlotsResponse extends Message<GetCalendarSlotsResponse> 
   message = "";
 
   /**
-   * @generated from field: timesense.v1.CalendarSlotPage data = 3;
+   * @generated from field: timesense.v1.SlotPage data = 3;
    */
-  data?: CalendarSlotPage;
+  data?: SlotPage;
 
   constructor(data?: PartialMessage<GetCalendarSlotsResponse>) {
     super();
@@ -214,7 +172,7 @@ export class GetCalendarSlotsResponse extends Message<GetCalendarSlotsResponse> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "data", kind: "message", T: CalendarSlotPage },
+    { no: 3, name: "data", kind: "message", T: SlotPage },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetCalendarSlotsResponse {
