@@ -95,6 +95,7 @@ export interface ListAppointmentsParams {
   limit: number
   offset: number
   calendarId?: string
+  bookerId?: string
   liveAt?: string
   expireAt?: string
 }

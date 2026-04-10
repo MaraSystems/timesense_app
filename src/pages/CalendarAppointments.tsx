@@ -222,12 +222,12 @@ export function CalendarAppointments() {
           </div>
         ) : (
           <>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {appointments.map((appointment) => (
                 <AppointmentCard
                   key={appointment.id}
                   appointment={appointment}
-                  showActions={isOwner ?? false}
+                  currentUserId={user?.id}
                   onDelete={(apt) => {
                     setAppointmentToDelete(apt)
                     setShowDeleteConfirm(true)

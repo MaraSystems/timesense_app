@@ -38,6 +38,7 @@ export const getAppointment = async (id: string) => {
 export const listAppointments = async (params: ListAppointmentsParams) => {
   const response = await client.listAppointments({
     calendarId: params.calendarId ? BigInt(params.calendarId) : undefined,
+    bookerId: params.bookerId ? BigInt(params.bookerId) : undefined,
     limit: params.limit,
     offset: params.offset,
     liveAt: params.liveAt ? Timestamp.fromDate(new Date(params.liveAt)) : undefined,

@@ -48,6 +48,7 @@ export function Appointments() {
       const response = await listAppointments({
         limit: PAGE_SIZE,
         offset: currentOffset,
+        bookerId: user.id,
         liveAt: liveAtFilter || undefined,
         expireAt: expireAtFilter || undefined,
       })
@@ -178,12 +179,12 @@ export function Appointments() {
           </div>
         ) : (
           <>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {appointments.map((appointment) => (
                 <AppointmentCard
                   key={appointment.id}
                   appointment={appointment}
-                  showActions={true}
+                  currentUserId={user?.id}
                   onDelete={(apt) => {
                     setAppointmentToDelete(apt)
                     setShowDeleteConfirm(true)
